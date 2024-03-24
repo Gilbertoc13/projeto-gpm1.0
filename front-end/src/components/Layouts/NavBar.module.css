@@ -15,7 +15,7 @@ nav {
 
 nav.scrolled {
     backdrop-filter: blur(5px);
-    background-color: #01020823;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .navbarLogo {

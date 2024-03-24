@@ -1,0 +1,39 @@
+.DailyGrid{
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(407px, 407px));
+    grid-gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.DailyGrid > *:first-child {
+    margin-right: auto;
+}
+
+.DailyGrid > *:last-child {
+    margin-left: auto;
+}
+
+@media (max-width: 450px) {
+    .DailyGrid {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .DailyGrid > *:first-child {
+        margin-right: 0;
+    }
+    
+    .DailyGrid > *:last-child {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 920px) {
+    .DailyGrid {
+        width: 90%;
+        display: flex;
+    }
+}

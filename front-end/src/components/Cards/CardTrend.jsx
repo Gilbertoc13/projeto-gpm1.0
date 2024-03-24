@@ -3,19 +3,18 @@ import { useState, useEffect } from "react";
 import styles from './CardTrend.module.css';
 
 function CardTrend({ id, tipo, isMiddlePage}) {
-    const API_KEY = 'API_KEY';
     const [content, setContent] = useState(null);
     const [logo, setLogo] = useState(null);
 
     useEffect(() => {
-        fetch(`https://api.themoviedb.org/3/${tipo}/${id}?api_key=${API_KEY}&append_to_response=images%2Caggregate_credits%2Cwatch_providers%2Csimilar%2Cexternal_ids%2Ccontent_ratings%2Creleases&language=pt-BR`)
+        fetch(`https://api.themoviedb.org/3/${tipo}/${id}?api_key=${import.meta.env.VITE_TMDB_API}&append_to_response=images%2Caggregate_credits%2Cwatch_providers%2Csimilar%2Cexternal_ids%2Ccontent_ratings%2Creleases&language=pt-BR`)
             .then(response => response.json())
             .then(response => {
                 setContent(response);
             })
             .catch(err => console.error(err));
 
-        fetch(`https://api.themoviedb.org/3/${tipo}/${id}/images?api_key=${API_KEY}`)
+        fetch(`https://api.themoviedb.org/3/${tipo}/${id}/images?api_key=${import.meta.env.VITE_TMDB_API}`)
             .then(response => response.json())
             .then(data => {
                 const ptItem = data.logos.find(item => item.iso_639_1 === "pt");
@@ -43,7 +42,7 @@ function CardTrend({ id, tipo, isMiddlePage}) {
                 <p className={styles.Overview}>{content?.overview}</p>
                 <div className={styles.Infos}>
                     <FaStar />
-                    <h2 className={styles.InfoH2}>{content?.vote_average.toFixed(1)}</h2>
+                    <h2 className={styles.InfoH2}>{((content?.vote_average.toFixed(1)/2).toFixed(1))}</h2>
                     <FaCalendar />
                     <h2 className={styles.InfoH2}>{tipo === "tv" ? content?.first_air_date?.split('-')[0] : content?.release_date?.split('-')[0]}</h2>
                 </div>

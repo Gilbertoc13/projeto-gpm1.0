@@ -51,6 +51,20 @@
     opacity: 70%;
 }
 
+.CardPosterStars{
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
+.CardPosterStars svg{
+    font-size: 12px;
+    fill: goldenrod;
+    margin-right: 3px;
+    opacity: 70%;
+}
+
 @media (max-width: 700px) {
     .CardPoster{
         min-width: 170px;

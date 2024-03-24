@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import styles from './CardsByGenre.module.css';
-import CardPoster from "./CardPoster";
+import CardPoster from "../Cards/CardPoster";
 
 function ContainerCards({ title, type }) {
-    const API_KEY = '2da54e7773e1f650b5dccea60ca453a7';
     const [content, setContent] = useState(null);
     const [selectedGenre, setSelectedGenre] = useState(null);
     const [genreContent, setGenreContent] = useState([]);
 
     useEffect(() => {
-        fetch(`https://api.themoviedb.org/3/trending/${type}/week?api_key=${API_KEY}&language=pt-BR`)
+        fetch(`https://api.themoviedb.org/3/trending/${type}/week?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR`)
             .then(response => response.json())
             .then(response => {
                 setGenreContent(response.results);
             })
             .catch(err => console.error(err));
 
-        fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=${API_KEY}&language=pt-BR`)
+        fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR`)
             .then(response => response.json())
             .then(response => {
                 setContent(response);
@@ -31,7 +30,7 @@ function ContainerCards({ title, type }) {
             setSelectedGenre(`Filmes ${genreName.toLowerCase()}`);
         }
 
-        fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&language=pt-BR&with_genres=${genreId}&certification_country=BR&certification.lte=14&page=1`)
+        fetch(`https://api.themoviedb.org/3/discover/${type}?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR&with_genres=${genreId}&certification_country=BR&certification.lte=14&page=1`)
             .then(response => response.json())
             .then(response => {
                 setGenreContent(response.results);
@@ -54,7 +53,7 @@ function ContainerCards({ title, type }) {
                     <CardPoster key={item.id}
                         img={`https://image.tmdb.org/t/p/w500/${item.poster_path}`}
                         title={type === "tv" ? item.name : item.title}
-                        estrelas={type === "tv" ? (item.vote_average/2).toFixed(1) : (item.vote_average/2).toFixed(1)}
+                        estrelas={type === "tv" ? (item.vote_average/2).toFixed(0) : (item.vote_average/2).toFixed(1)}
                     ></CardPoster>
                 ))}
             </div>
