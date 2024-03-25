@@ -71,6 +71,7 @@ function Home() {
         {movies.map(movie => (
           <Ticket
             key={movie.id}
+            id={movie.id}
             title={movie.title}
             rate={(movie.vote_average.toFixed(1))/2}
             backDrop={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
