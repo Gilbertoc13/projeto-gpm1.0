@@ -2,6 +2,8 @@
   font-family: montserrat, sans-serif;
   margin: 0px;
   padding: 0px;
+  text-decoration: none;
+  color: inherit;
 }
 
 :root{
@@ -10,6 +12,11 @@
   --corCinza: #686e7a;
   --corVerde: #00e486;
   --corTexto: #ffffff;
+}
+
+Link{
+  text-decoration: none;
+  border: none;
 }
 
 body, #root, .App{

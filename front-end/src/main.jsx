@@ -7,6 +7,7 @@ import Home from './routes/Home.jsx'
 import Login from './routes/Login.jsx'
 import Search from './routes/Search.jsx'
 import Error from './routes/Error.jsx'
+import Details from './routes/Details.jsx'
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
     {
       path: '/search',
       element: <Search/>
+    },
+    {
+      path: 'details/:tipo/:id',
+      element: <Details/>
     }
   ]
   } 

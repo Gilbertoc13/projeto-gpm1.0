@@ -10,28 +10,27 @@ function Home() {
   const [movies, setMovies] = useState([]);
   const [trendingSeries, setTrendingSeries] = useState(null);
   const [trendingMovie, setTrendingMovie] = useState(null);
-  const API_KEY = '2da54e7773e1f650b5dccea60ca453a7';
 
   useEffect(() => {
     fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR`)
-      .then(response => response.json())
-      .then(data => {
-        setTrendingSeries(data.results[0]);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    .then(response => response.json())
+    .then(data => {
+      setTrendingSeries(data.results[0]);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 
-    fetch('https://api.themoviedb.org/3/trending/movie/week?api_key=2da54e7773e1f650b5dccea60ca453a7&language=pt-BR')
-      .then(response => response.json())
-      .then(data => {
-        setTrendingMovie(data.results[0]);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR`)
+    .then(response => response.json())
+    .then(data => {
+      setTrendingMovie(data.results[0]);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 
-    fetch('https://api.themoviedb.org/3/movie/now_playing?api_key=2da54e7773e1f650b5dccea60ca453a7&language=pt-BR&region=BR')
+    fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${import.meta.env.VITE_TMDB_API}&language=pt-BR&region=BR`)
       .then(response => response.json())
       .then(data => {
         setMovies(data.results.slice(0, 6));

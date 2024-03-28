@@ -54,6 +54,8 @@ function ContainerCards({ title, type }) {
                         img={`https://image.tmdb.org/t/p/w500/${item.poster_path}`}
                         title={type === "tv" ? item.name : item.title}
                         estrelas={type === "tv" ? (item.vote_average/2).toFixed(0) : (item.vote_average/2).toFixed(1)}
+                        id={item.id}
+                        tipo={type}
                     ></CardPoster>
                 ))}
             </div>

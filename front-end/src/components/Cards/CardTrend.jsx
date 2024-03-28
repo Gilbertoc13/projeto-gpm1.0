@@ -1,5 +1,6 @@
 import { FaStar, FaCalendar } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import { Link } from 'react-router-dom';
 import styles from './CardTrend.module.css';
 
 function CardTrend({ id, tipo, isMiddlePage}) {
@@ -36,7 +37,7 @@ function CardTrend({ id, tipo, isMiddlePage}) {
     }    const destaqueClasses = isMiddlePage ? `${styles.Fade} ${styles.MiddlePage}` : styles.Fade;
 
     return (
-        <div className={styles.Destaque} onClick={redirecionar} style={backgroundImageStyle}>
+        <Link to={`/details/${tipo}/${id}`} className={styles.Destaque} onClick={redirecionar} style={backgroundImageStyle}>
             <div className={destaqueClasses}>
                 <img src={`https://image.tmdb.org/t/p/original${logo?.file_path}`} alt="" />
                 <p className={styles.Overview}>{content?.overview}</p>
@@ -53,7 +54,7 @@ function CardTrend({ id, tipo, isMiddlePage}) {
                     <h2 className={styles.InfoH2}>{content?.genres.map(genre => genre.name).join(", ")}</h2>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 

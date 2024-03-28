@@ -1,10 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './CardPoster.module.css';
 import { FaStar, FaQuestion } from "react-icons/fa6";
+import { useState, useEffect } from "react";
 
-const CardPoster = ({img, title, estrelas}) => {
+const CardPoster = ({img, title, estrelas, tipo, id}) => {
     return (
-        <div className={styles.CardPoster}>
+        <Link to={`/details/${tipo}/${id}`} className={styles.CardPoster}>
             <img src={img} />
             <h3 className={styles.CardPosterH3}>{title}</h3>
             <div className={styles.CardPosterStars}>
@@ -16,7 +18,7 @@ const CardPoster = ({img, title, estrelas}) => {
                     ))
                 )}
             </div>
-        </div>
+        </Link>
     );
 }
 

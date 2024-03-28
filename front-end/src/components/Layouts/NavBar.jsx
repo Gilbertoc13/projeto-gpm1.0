@@ -36,7 +36,6 @@ const NavBar = () => {
                     </div>
                 </Link>
                 <div className={styles.navbarSearch}>
-                    <input type="text" placeholder='Buscar...'/>
                     <Link to={'/search/'}>
                         <FaSearch />
                     </Link>

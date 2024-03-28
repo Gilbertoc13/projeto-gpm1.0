@@ -1,5 +1,6 @@
 import styles from './Ticket.module.css'
 import QR from '../assets/qr-moviemetricks.svg'
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa6";
 
@@ -17,7 +18,7 @@ function Ticket({title, rate, backDrop, poster, DiaMes, ano, id}){
     }, [id]);
 
     return(
-        <div className={styles.DivTicket}>
+        <Link to={`/details/movie/${id}`} className={styles.DivTicket}>
         <img className={styles.PosterTicket} src={poster} alt="" />
         <div className={styles.TicketDivisor}/>
         <div>
@@ -50,7 +51,7 @@ function Ticket({title, rate, backDrop, poster, DiaMes, ano, id}){
                 </div>
             </div>
         </div>
-        </div>
+        </Link>
     )
 
 }

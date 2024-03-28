@@ -1,15 +1,16 @@
-import '../index.css';
-
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
-const Detalhes = ({ match }) => {
-  const { tipo, id } = match.params;
+function Details() {
+  const { tipo, id } = useParams();
+
+  console.log(tipo, id);
 
   return (
     <div>
-      <h2>Detalhes do {tipo} com ID {id}</h2>
+      <h2>Tipo: {tipo} ID: {id}</h2>
     </div>
   );
-};
+}
 
-export default Detalhes;
+export default Details;

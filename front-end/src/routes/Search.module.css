@@ -1,0 +1,85 @@
+.SearchDiv{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.DivInput{
+  width: 88vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--corClaro);
+  border-radius: 10px;
+  padding-block: 7px;
+  padding-inline: 20px;
+  margin-top: 85px;
+}
+
+.DivInput input{
+  width: 100%;
+  border: none;
+  background-color: var(--corClaro);
+  font-size: 1.2rem;
+  color: var(--corTexto);
+  outline: none;
+  text-decoration: none;
+}
+
+.DivInput input::placeholder{
+  font-size: 1em;
+}
+
+.DivInput svg{
+  font-size: 20px;
+  transition: all 0.5s;
+}
+
+.DivInput svg:hover{
+  cursor: pointer;
+  color: var(--corVerde);
+}
+
+.DivResults{
+  width: 100%;
+  margin-top: 30px;
+  min-height: calc(100vh - 327px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(407px, 407px));
+  grid-gap: 30px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.NoResults{
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex-direction: column;
+  margin-top: 5%;
+  min-height: calc(100vh - 370px);
+}
+
+.NoResults svg{
+  font-size: 105px;
+  margin-top: auto;
+}
+
+.NoResults p{
+  margin-top: 10px;
+  font-weight: bolder;
+  font-size: 1.3em;
+  margin-bottom: auto;
+}
+
+@media (max-width: 920px) {
+  .DivInput {
+      width: 80vw;
+  }
+  .DivInput input{
+      font-size: 1rem;
+  }	
+}
