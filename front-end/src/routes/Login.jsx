@@ -5,7 +5,7 @@ function Login() {
   
   return (
     <div className="App">
-        <div style={{height: '100vh', display: 'flex', justifyContent: 'center', backgroundColor: 'var(--corFundo)', width: '100%'}}>
+        <div style={{height: '100vh', display: 'flex', justifyContent: 'center', backgroundColor: 'var(--corFundo)', width: '100%', flexDirection: 'row'}}>
           <CadastroLogin></CadastroLogin>
         </div>
     </div>

@@ -1,6 +1,7 @@
 import '../index.css';
 import { useEffect, useState } from 'react';
 import styles from './Search.module.css';
+import { Link } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import { FaFaceSadTear } from "react-icons/fa6";
 import CardDaily from '../components/Cards/CardDaily';
@@ -50,9 +51,24 @@ function Search(){
                 <FaFaceSadTear />
                 <p>Nenhum resultado.</p>
             </div>
+            {trends.some(trend => trend.media_type === 'person' && trend.profile_path !== null) && (
+                <div className={styles.Pessoas}>
+                    <h4>Pessoas</h4>
+                    <div className={styles.DivPessoas}>
+                        {trends
+                            .filter(trend => trend.media_type === 'person' && trend.profile_path !== null)
+                            .map(trend => (
+                                <Link to={`/person/${trend.id}`} key={trend.id} className={styles.DivPessoa}>
+                                    <img src={`https://image.tmdb.org/t/p/w100_and_h100_face/${trend.profile_path}`} />
+                                    <h1>{trend.name}</h1>
+                                </Link>
+                            ))}
+                    </div>
+                </div>
+            )}
             <div className={styles.DivResults} style={{ display: trends.length === 0 ? 'none' : 'grid' }}>
                 {trends
-                    .filter(trend => trend.popularity > 1 && trend.backdrop_path !== null)
+                    .filter(trend => (trend.media_type === 'tv' || trend.media_type === 'movie') && trend.popularity > 1 && trend.backdrop_path !== null)
                     .map(trend => (
                         <CardDaily
                             key={trend.id}

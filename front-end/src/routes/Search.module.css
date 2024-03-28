@@ -43,7 +43,7 @@
 
 .DivResults{
   width: 100%;
-  margin-top: 30px;
+  margin-top: 15px;
   min-height: calc(100vh - 327px);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(407px, 407px));
@@ -75,9 +75,78 @@
   margin-bottom: auto;
 }
 
+.Pessoas{
+  width: calc(100% - 30px);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--corClaro);
+  border-radius: 10px;
+  margin-top: 15px;
+  padding-block: 7px;
+  padding-inline: 15px;
+  display: flex;
+}
+
+.Pessoas h4{
+  font-size: 1.15em;
+  text-align: left;
+  margin-block: 4px;
+  padding-left: 15px;
+}
+
+.Pessoas h1{
+  font-size: 1.15em;
+  text-align: left;
+  margin-block: 4px;
+}
+
+.DivPessoas{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 88vw;
+  justify-content: left;
+  align-items: top;
+  padding-top: 7px;
+  overflow-x: hidden;
+}
+
+.DivPessoa:hover{
+  cursor: pointer;
+}
+
+.DivPessoa{
+  align-items: top;
+  max-width: 70px;
+  margin-inline: 7px;
+}
+
+.DivPessoa img{
+  height: 65px;
+  border-radius: 50%;
+  border: 2px solid var(--corCinza);
+  transition: all 0.3s;
+  min-width: 65px;
+}
+
+.DivPessoa:hover img{
+  border: 2px solid var(--corVerde);
+}
+
+.DivPessoa h1{
+  width: auto;
+  font-size: 0.7em;
+  font-weight: lighter;
+  text-align: center;
+  overflow: hidden;
+}
+
 @media (max-width: 920px) {
   .DivInput {
       width: 80vw;
+  }
+  .Pessoas{
+    width: 80vw;
   }
   .DivInput input{
       font-size: 1rem;

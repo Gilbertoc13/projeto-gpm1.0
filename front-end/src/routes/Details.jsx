@@ -8,7 +8,7 @@ function Details() {
 
   return (
     <div>
-      <h2>Tipo: {tipo} ID: {id}</h2>
+      <h2>Detalhes do {tipo} {id}</h2>
     </div>
   );
 }

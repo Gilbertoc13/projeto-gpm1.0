@@ -23,7 +23,7 @@ function CardDaily({ tipo, id, overview, vote_average, original_language, releas
         <div className={styles.DailyFade}>
           {logo ? (
             <>
-              <img className={styles.DailyLogo} src={`https://image.tmdb.org/t/p/w300${logo.file_path}`} alt="" />
+              <img className={styles.DailyLogo} src={`https://image.tmdb.org/t/p/w200${logo.file_path}`} alt="" />
               <p className={styles.DailyOverview}>{overview}</p>
             </>
           ) : (

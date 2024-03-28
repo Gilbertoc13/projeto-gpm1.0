@@ -7,11 +7,13 @@ function CadastroLogin() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [username, setUsername] = useState('');
+    const [repetirSenha, setRepetirSenha] = useState('');
     const [isCadastro, setIsCadastro] = useState(false);
 
     const handleEmailChange = (event) => setEmail(event.target.value);
     const handleSenhaChange = (event) => setSenha(event.target.value);
     const handleUsernameChange = (event) => setUsername(event.target.value);
+    const handleRepetirSenhaChange = (event) => setRepetirSenha(event.target.value);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -20,6 +22,7 @@ function CadastroLogin() {
         console.log('Email:', email);
         console.log('Senha:', senha);
         console.log('Nome de usuário:', username);
+        console.log('Repetir Senha:', repetirSenha);
     };
 
     const handleToggleCadastro = () => setIsCadastro(!isCadastro);
@@ -52,6 +55,14 @@ function CadastroLogin() {
                     value={senha}
                     onChange={handleSenhaChange}
                 />
+                {isCadastro && (
+                    <input
+                        type="password"
+                        placeholder="Repetir senha"
+                        value={repetirSenha}
+                        onChange={handleRepetirSenhaChange}
+                    />
+                )}
                 <button type="submit">
                     {isCadastro ? 'Cadastrar' : 'Entrar'}
                 </button>
