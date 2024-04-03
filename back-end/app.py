@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 #banco de dados para importar
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
@@ -23,9 +23,10 @@ filmes_collection = db['filmes']
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        senha = request.form['senha']
-
+        username = request.json.get('username')
+        email = request.json.get('email')
+        senha = request.json.get('senha')
+       
         usuario = usuarios_collection.find_one({'email': email})
 
         if usuario and bcrypt.check_password_hash(usuario['senha'], senha):
@@ -39,11 +40,12 @@ def login():
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
-        email = request.form['email']
-        senha = request.form['senha']
+        username = request.json.get('username')
+        email = request.json.get('email')
+        senha = request.json.get('senha')
 
         hashed_senha = bcrypt.generate_password_hash(senha).decode('utf-8')
-        novo_usuario = {'email': email, 'senha': hashed_senha}
+        novo_usuario = {'email': email, 'senha': hashed_senha, 'username': username}
         usuarios_collection.insert_one(novo_usuario)
 
         return 'Usuário cadastrado com sucesso!'
