@@ -5,9 +5,11 @@ from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
 
 
+
 app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta'
 bcrypt = Bcrypt(app)
+
 
 #configurações do banco de dados
 Mongo_URL= 'mongodb://localhost:27017/'
