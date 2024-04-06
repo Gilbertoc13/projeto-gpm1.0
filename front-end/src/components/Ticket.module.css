@@ -1,0 +1,164 @@
+.DivTicket{
+    height: 200px;
+    background-color: var(--corClaro);
+    border-radius: 20px;
+    display: flex;
+    overflow: hidden;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.DivTicket:hover{
+    cursor: pointer;
+}
+
+.PosterTicket{
+    border-top-left-radius: 20px;
+    height: 100%;
+    transition: all 0.2s;
+}
+
+.DivTicket:hover .PosterTicket{
+    cursor: pointer;
+    transform: scale(1.06);
+}
+
+.D1{
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    background-color: var(--corFundo);
+    position: relative;
+    top: -15px;
+    left: -18px;
+}
+
+.D2{
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    background-color: var(--corFundo);
+    position: relative;
+    top: 155px;
+    left: -18px;
+}
+
+.TicketDivisor{
+    height: 100%;
+    width: 0px;
+    margin-left: 0px;
+    border-left: 4px dashed var(--corFundo);
+}
+
+.TicketInfos{
+    width: 270px;
+    height: 100%;
+}
+
+.TicketBackdrop{
+    width: 100%;
+    height: 60%;
+    background-size: cover;
+}
+
+.TicketFade{
+    min-width: 150px;
+    height: 100%;
+    background-image: linear-gradient(to top, var(--corClaro), transparent 150%);
+    display: flex;
+    flex-direction: column;
+}
+
+.Title{
+    position: relative;
+    font-size: 1em;
+    padding-inline: 20px;
+    text-align: center;
+    font-weight: bolder;
+    top: 28px;
+}
+
+.TicketLogo{
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 100px;
+    max-height: 50px;
+    max-width: 170px;
+}
+
+.RowTicket{
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.TicketQR{
+    margin-left: 25px;
+    height: 60px;
+}
+
+.TicketSeparador{
+    height: 80%;
+    width: 2px;
+    margin-inline: auto;
+    background-color: var(--corFundo);
+}
+
+.TicketDivDates{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.TicketDivDates h2{
+    font-size: .9em;
+}
+
+.TicketDivDates h3{
+    font-size: .9em;
+    margin-top: 5px;
+    opacity: 50%;
+}
+
+.DivRate{
+    margin-right: 25px;
+}
+
+.DivRate h4{
+    font-size: 1.3em;
+}
+
+.DivRate span{
+    opacity: 50%;
+    font-size: 0.5em;
+    margin-left: 3px;
+}
+
+.DivRate svg{
+    fill: goldenrod;
+    opacity: 70%;
+    text-align: right;
+    margin-top: 5px;
+}
+
+@media (max-width: 430px) {
+    .DivTicket{
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 330px) {
+    .DivTicket{
+        transform: scale(0.6);
+    }
+}
+
+@media (max-width: 280px) {
+    .DivTicket{
+        transform: scale(0.5);
+    }
+}

@@ -1,0 +1,98 @@
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 80px;
+    z-index: 999;
+    pointer-events: none;
+    transition: backdrop-filter 0.3s ease, background-color 0.3s ease;
+}
+
+nav.scrolled {
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.navbarLogo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    transition: all 0.2s;
+    pointer-events: all;
+}
+
+.navbarLogo:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.navbarTitle {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.navbarIcons {
+    display: flex;
+    align-items: center;
+}
+
+.navbarIcon, .navbarSearch {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 20px;
+    pointer-events: all;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+    overflow: hidden;
+}
+
+.navbarIcon svg, .navbarSearch svg {
+    color: #fff;
+    font-size: 17px;
+    transition: all 0.2s;
+}
+
+.navbarIcon:hover, .navbarSearch:hover {
+    cursor: pointer;
+}
+
+.navbarIcon:hover svg, .navbarSearch:hover svg{
+    cursor: pointer;
+    transform: scale(1.15);
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: transparent;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        z-index: 999;
+    }
+    .navbarSearch:hover {
+        border-radius: 100%;
+        width: 40px;
+    }
+    .navbarSearch:hover svg{
+        margin: 0;
+    }
+    .navbarSearch input {
+        display: none;
+    }
+}

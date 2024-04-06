@@ -1,0 +1,125 @@
+.DailyDiv{
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: var(--CorClaro);
+    width: auto;
+    height: auto;
+    overflow: hidden;
+}
+
+.DailyDiv:hover{
+    cursor: pointer;
+}
+
+.DailyBackdrop{
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.DailyFade{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    background-image: linear-gradient(to top, var(--corClaro), transparent 80%);
+    transition: background-image 0.3s ease;
+}
+
+.DailyDiv:hover .DailyFade {
+    background-image: linear-gradient(to top, var(--corClaro), transparent 250%);
+}
+
+.DailyLogo, .DailyTitle{
+    max-width: 70%;
+    height: auto;
+    margin-inline: auto;
+    margin-top: auto;
+    margin-bottom: 20px;
+    max-height: 100px;
+}
+
+.DailyTitle{
+    font-size: 1.25em;
+    font-weight: bold;
+    color: var(--corTexto);
+    text-align: center;
+    width: 90%;
+}
+
+.DailyOverview {
+    width: 90%;
+    text-align: left;
+    margin-inline: auto;
+    font-size: 0.8em;
+    font-weight: lighter;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s ease;
+    text-overflow: ellipsis;
+    max-height: auto;
+}
+
+.DailyDiv:hover .DailyOverview {
+    height: 36%;
+}
+
+.DailyInfos{
+    width: auto;
+    height: auto;
+    background-color: var(--corClaro);
+    padding-block: 15px;
+    display: flex;
+}
+
+.DailyInfo{
+    width: 70px;
+    display: flex;
+    border-radius: 10px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--corFundo);
+    margin-inline: auto;
+}
+
+.DailyInfo svg{
+    opacity: 0.5;
+    margin-right: 10px;
+}
+
+.DailyInfo p{
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+@media (max-width: 450px) {
+    .DailyDiv {
+        width: 90%;
+    }
+    .DailyInfo{
+        width: auto;
+    }
+}
+
+@media (max-width: 920px) {
+    .DailyDiv {
+        width: 400px;
+        margin-inline: auto;
+    }
+}
+
+@media (max-width: 450px) {
+    .DailyDiv {
+        width: 330px;
+        margin-inline: auto;
+    }
+}

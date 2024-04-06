@@ -1,0 +1,25 @@
+.SeparadorDiv{
+    border-radius: 10px;
+    width: 90vw;
+    padding-block: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.SeparadorDiv h2{
+    font-size: 1.3em;
+    font-weight: lighter;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+
+.SeparadorDiv hr{
+    flex-grow: 1;
+    height: 2px;
+    margin-left: 20px;
+    background-color: var(--corClaro);
+    border: none;
+}

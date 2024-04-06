@@ -1,0 +1,82 @@
+.ContainerCards{
+    background: linear-gradient(to bottom, var(--corClaro), transparent 80%);
+    border-radius: 10px;
+    width: 90vw;
+    min-height: 400px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ContainerCards h2{
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: left;
+    margin-inline: 30px;
+    margin-top: 20px;
+    text-align: left;
+    width: 95%;
+}
+
+.divGeneros{
+    width: 95%;
+    display: flex;
+    flex-wrap: wrap;
+    padding-inline: 20px;
+    margin-block: 15px;
+    justify-content: start;
+    align-items: center;
+}
+
+.divCards {
+    width: 97%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 185px)); /* ajuste do tamanho mínimo e máximo */
+    grid-gap: 0px;
+    justify-content: center; /* centraliza as colunas horizontalmente */
+    align-items: center;
+}
+
+
+.Genero{
+    background-color: var(--corFundo);
+    border-radius: 10px;
+    padding-inline: 10px;
+    padding-block: 10px;
+    margin-inline: 5px;
+    margin-block: 5px;
+    font-size: .8em;
+    transition: all .3s;
+    font-weight: bold;
+    user-select: none;
+    text-wrap: nowrap;
+}
+
+.Genero:hover, .Genero:active{
+    cursor: pointer;
+    background-color: white;
+    color: var(--corFundo);
+}
+
+@media (max-width: 700px) {
+    .divGeneros{
+        flex-wrap: nowrap;
+        display: flex;
+        padding-inline: 10px;
+        margin-block: 7px;
+        justify-content: start;
+        align-items: center;
+        overflow-x: scroll;
+    }
+    .ContainerCards h2{
+        margin-top: 15px;
+        padding-left: 20px;
+    }
+    .divCards{
+        display: flex;
+        flex-direction: row;
+        overflow-x: scroll;
+        justify-content: start;
+    }
+}
