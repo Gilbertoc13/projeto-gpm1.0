@@ -54,3 +54,13 @@ class User:
         users_collection = db.users
         result = users_collection.find_one_and_delete({"_id": ObjectId(user_id)})
         return result
+    
+    @staticmethod
+    def get_user_movie_list(user_id):
+        user = User.get_user_by_id_model(user_id)
+        if user:
+            return user.get('movie_list', [])
+        else:
+            return None
+    
+    
