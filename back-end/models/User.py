@@ -15,6 +15,8 @@ class User:
             "username": username,
             "email": email,
             "password": hashed_password_base64,
+            "movie_list": [],
+            "watched_movies": []
         }
         result = users_collection.insert_one(new_user)
         return str(result.inserted_id)
@@ -62,11 +64,28 @@ class User:
             return user.get('movie_list', [])
         else:
             return None
+        
     @staticmethod
-    def add_watched_movie(user_id, movie_id):
-        users_collection = db.users
-        result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"watched_movies": movie_id}})
-        return result.modified_count > 0
+    def remove_movie_from_list(user_id, movie_id):
+        try:
+            users_collection = db.users
+            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"movie_details": movie_id}})
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error deleting movie details from user: {e}")
+            return False
+
+    @staticmethod
+    def remove_movie_from_watched_movies(user_id, movie_id):
+        try:
+            users_collection = db.users
+            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched_movies": movie_id}})
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error removing movie from watched movies of user: {e}")
+            return False
+        
+ 
   
         
     

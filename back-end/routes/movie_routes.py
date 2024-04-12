@@ -1,11 +1,11 @@
 
-from flask import request,jsonify, Blueprint
-from flask_jwt_extended import jwt_required
-from models.Content import Movie
+from flask import make_response, request,jsonify, Blueprint
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from models.Movie import Movie
 from models.User import User
 from flask import jsonify
 from werkzeug.exceptions import BadRequest 
-from controller.user_controller import get_user_data
+from bson import ObjectId
 
 
 movie_app = Blueprint("movie_app", __name__)
@@ -46,68 +46,111 @@ def create_media(media_type):
         return jsonify({"message": "Internal server error"}), 500
 
 
+@movie_app.route('/api/user/movies/<user_id>', methods=['GET'])
+def get_user_movies(user_id):
+    try:
+      
+        if not user_id or not isinstance(user_id, str):
+            raise BadRequest("Invalid user ID")
+
+        
+        user_movies = User.get_user_movie_list(user_id)
+
+        
+        if not user_movies:
+            return jsonify({"message": "No movies found in the user's list"}), 404
+
+        
+        return jsonify({"user_movies": user_movies}), 200
+
+    except BadRequest as e:
+        return make_response(jsonify({"error": str(e)}), 400)
+
+    except Exception as e:
+        return make_response(jsonify({"error": f"Unknown error: {str(e)}"}), 500)
+
+
+
+def add_to_watchlist(media_type, media_id, user_id):
+
+    
+    if not isinstance(media_id, str) or len(media_id) < 24:
+        return jsonify({'message': 'Invalid media ID'}), 400
+
+
+    if media_type == 'movies':
+        media_data = Movie.get_movie_by_id_model({'_id': ObjectId(media_id)})
+        if not media_data:
+            return jsonify({'message': 'Media not found'}), 404
+
+    
+    User.update_user({'_id': ObjectId(user_id)}, {'$push': {'watched_movies': media_id}})
+
+    return jsonify({'message': 'Media added to watchlist successfully'}), 200
+
+
+@movie_app.route('/api/watchlist/<media_type>/<media_id>', methods=['POST'])
+@jwt_required()
+def add_to_watchlist(media_type, media_id):
+    
+    user_id = get_jwt_identity()
+
+    if media_type not in ['movies', 'series']:
+        return jsonify({'message': 'Invalid media type'}), 400
+
+    
+    if not isinstance(media_id, str) or len(media_id) < 24:
+        return jsonify({'message': 'Invalid media ID'}), 400
+
+    
+
+    add_to_watchlist(media_type, media_id, user_id)
+
+    
+    return jsonify({'message': 'Media added to watchlist successfully'}), 200
+
+@movie_app.route('/api/user/movies/<movie_id>', methods=['DELETE'])
+def delete_movie_from_user_list(movie_id):
+    try:
+        
+        user_id = request.json.get('user_id')
+
+        
+        if not user_id or not isinstance(user_id, str):
+            raise BadRequest("Invalid user ID")
+
+        
+        if not User.get_user_movie_list(user_id, movie_id):
+            return jsonify({"message": "Movie not found in user's list"}), 404
+
+       
+        success = User.remove_movie_from_list(user_id, movie_id)
+
+        if success:
+
+            
+            User.remove_movie_from_watched_movies(user_id, movie_id)
+
+            return jsonify({"message": "Movie removed from user's list successfully"}), 200
+        else:
+            return jsonify({"message": "Failed to remove movie from user's list"}), 500
+
+    except BadRequest as e:
+        return jsonify({"error": str(e)}), 400
+
+    except Exception as e:
+        return jsonify({"error": f"Unknown error: {str(e)}"}), 500
+
+
+
+
+
+
+
+
  
 
        
-
-@movie_app.route('/api/movies', methods=['GET'])
-@jwt_required()
-def get_movies():
-    try:
-        user_id = get_user_data()
-
-        if not user_id:
-            return jsonify({"message": "User not authenticated"}), 401
-
-        
-        watched_movies = User.get_user_movie_list(user_id)  
-
-        if not watched_movies:
-            return jsonify({"message": "No movies found in your watched list"}), 404
-
-        
-        movies_data = []
-        for movie_id in watched_movies:
-            movie = Movie.get_movie_by_id_model(movie_id)
-            if movie:
-                
-                movie["_id"] = str(movie["_id"])  
-                movies_data.append(movie)
-
-        return jsonify(movies_data), 200
-
-    except Exception as e:
-        print(f"Error getting movies: {e}")
-        return jsonify({"message": "Internal server error"}), 500
-
-
-
-
-@movie_app.route('/api/movies/<movie_id>/watched', methods=['POST'])
-@jwt_required()
-def mark_watched_route(movie_id):
-    try:
-        user_id = get_user_data()
-        
-        if not user_id:
-            return jsonify({"message": "User not authenticated"}), 401
-        
-        movie = Movie.get_movie_by_id_model(movie_id)
-        if not movie:
-            return jsonify({"message": "Movie not found"}), 404
-        
-        user = User.get_user_movie_list(user_id)
-        if not user:
-            return jsonify({"message": "User not found"}), 404
-        
-        user = User.add_watched_movie(movie_id)
-        
-        return jsonify({"message": "Movie marked as watched for the user"}), 200
-    
-    except Exception as e:
-        print(f"Error marking movie as watched: {e}")
-        return jsonify({"message": "Internal server error"}), 500
-
 
 
 

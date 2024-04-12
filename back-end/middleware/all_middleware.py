@@ -1,6 +1,7 @@
 from flask import abort
-from models.Content import Movie
+from models.Movie import Movie
 from models.User import User
+from models.Comment import Comment
 
 
 def verify_user(userId):               
@@ -22,5 +23,7 @@ def verify_movie(movie_id):
     if previous_movie:
         return previous_movie
     return False
+
+
 
 
