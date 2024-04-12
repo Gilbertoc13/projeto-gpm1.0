@@ -62,5 +62,13 @@ class User:
             return user.get('movie_list', [])
         else:
             return None
+    @staticmethod
+    def add_watched_movie(user_id, movie_id):
+        users_collection = db.users
+        result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"watched_movies": movie_id}})
+        return result.modified_count > 0
+  
+        
+    
     
     
