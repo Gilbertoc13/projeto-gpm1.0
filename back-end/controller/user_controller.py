@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity
 from models.User import User
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest 
-from middleware.all_middleware import verify_email_registered, verify_user
+from middleware.all_middleware import verify_email_registered
 
 
 def login(email, password):

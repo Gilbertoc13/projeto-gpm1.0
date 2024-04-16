@@ -2,7 +2,7 @@
 from flask import request,jsonify, Blueprint
 from flask_jwt_extended import jwt_required
 from controller.user_controller import login, create_user_controller, get_user_data
-from models.Movie import Movie
+from models.Midia import Movie
 from models.User import User
 from flask import jsonify
 

@@ -3,7 +3,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from routes.user_routes import main_bp
 from routes.tmdb_routes import tmdb_bp
-from routes.movie_routes import movie_app
+from routes.midia_routes import movie_app
 from routes.comment_routes import comment_app
 import os
 from pymongo import MongoClient
