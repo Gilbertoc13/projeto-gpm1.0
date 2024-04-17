@@ -15,7 +15,6 @@ class User:
             "username": username,
             "email": email,
             "password": hashed_password_base64,
-            "midia_list": [],
             "watched_movies": []
         }
         result = users_collection.insert_one(new_user)
@@ -58,33 +57,50 @@ class User:
         return result
     
     @staticmethod
-    def get_user_midia_list(user_id):
-        user = User.get_user_by_id_model(user_id)
-        if user:
-            return user.get('movie_list', [])
-        else:
-            return None
-        
-    @staticmethod
-    def remove_midia_from_list(user_id, midia_id):
+    def add_movie_to_watchlist(user_id, movie_id):
         try:
             users_collection = db.users
-            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"midia_list": midia_id}})
-            return result.modified_count > 0
+
+            existing_watchlist = users_collection.find_one({'_id': ObjectId(user_id)}, {'watchlist': 1})
+            if existing_watchlist and 'watchlist' in existing_watchlist:
+                if movie_id in existing_watchlist['watchlist']:
+                    return {'message': 'Movie already exists in watchlist'}, 400
+
+            
+            update_result = users_collection.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$push': {'watchlist': movie_id}}
+            )
+
+            if update_result.modified_count == 1:
+                return {'message': 'Movie added to watchlist successfully'}, 200
+            else:
+                return {'message': 'Error adding movie to watchlist'}, 500
+
         except Exception as e:
-            print(f"Error deleting midia details from user: {e}")
-            return False
+            print(f"Error adding movie to watchlist: {e}")
+            return {'message': 'Internal server error'}, 500
 
     @staticmethod
-    def remove_midia_from_watched_movies(user_id, midia_id):
+    def delete_movie_from_watchlist(user_id, movie_id):
         try:
             users_collection = db.users
-            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched_midias": midia_id}})
-            return result.modified_count > 0
+
+            update_result = users_collection.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$pull': {'watchlist': movie_id}}
+            )
+
+            if update_result.modified_count == 1:
+                return {'message': 'Movie removed from watchlist successfully'}, 200
+            elif update_result.matched_count == 0:
+                return {'message': 'User not found'}, 404
+            else:
+                return {'message': 'Error removing movie from watchlist'}, 500
+
         except Exception as e:
-            print(f"Error removing movie from watched media of user: {e}")
-            return False
-        
+            print(f"Error removing movie from watchlist: {e}")
+            return {'message': 'Internal server error'}, 500
  
   
         

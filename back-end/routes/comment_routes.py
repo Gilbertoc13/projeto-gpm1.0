@@ -3,9 +3,7 @@ from flask import request,jsonify, Blueprint
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from models.Comment import Comment
 from flask import jsonify
-from werkzeug.exceptions import BadRequest
 from dotenv import load_dotenv
-from models.Midia import Midia
 load_dotenv()
 
 
@@ -18,100 +16,63 @@ user_tk = os.getenv('JWT_SECRET_KEY')
 
 
 
-@comment_app.route('/api/comments/<media_id>/<content>', methods=['POST'])
+@comment_app.route('/api/comments', methods=['POST'])
 @jwt_required()
-def add_comment(midia_id, content):
+def create_comment():
     user_id = get_jwt_identity()
+    data = request.json() 
 
-    if not isinstance(midia_id, str) or len(midia_id) < 24:
-        return jsonify({'message': 'Invalid media ID'}), 400
 
+    tmdb_id = data['tmdb_id']
+    comment = data['comment',[]]
+    is_spoiler = data['isSpoiler', False] 
     
-    midia = Midia.get_midia_by_id_model(midia_id)
-    if not midia:
-        
-        title = request.form.get('title')
-        midia = Midia.create_midia(title=title, midia_type='')
+    comment_id = Comment.create_comment(user_id, tmdb_id, comment, is_spoiler)
+
+    if comment_id:
+        return jsonify({'message': 'Comment created successfully', 'comment_id': comment_id}), 201
+    else:
+        return jsonify({'message': 'Error creating comment'}), 500
+
+
+
+
+@comment_app.route('/api/comments/<comments_id>', methods=['PUT'])
+@jwt_required()
+def update_comment(comment_id):
+
+    data = request.json()
     
-    username = request.form.get('username')
-    content = request.form.get('content')
-    is_spoiler = request.form.get('isSpoiler', False)  
+    new_comment= data['comment',[]]
+    is_spoiler = data['isSpoiler', False] 
 
-    try:
-        comment_id = Comment.create_comment_evaluation_model(midia_id, user_id, username, content, is_spoiler, content)
-        return jsonify({'message': 'Comment added successfully', 'comment_id': str(comment_id)}), 201
-    except Exception as e:
-        return jsonify({'message': 'Error adding comment'}), 500
+    update_success = Comment.update_comment(comment_id, new_comment, is_spoiler)
 
-
+    if update_success:
+        return jsonify({'message': 'Comment updated successfully'}), 200
+    else:
+        return jsonify({'message': 'Error updating comment'}), 500
 
 
-@comment_app.route('/api/comments/<user_id>/<comment_id>', methods=['PUT'])
+@comment_app.route('/api/comments/<comment_id>', methods=['DELETE'])
 @jwt_required()
-def update_comment_route(user_id, comment_id):
-    try:
-        current_user_id = get_jwt_identity()
+def delete_comment(comment_id):
+    
+    delete_success = Comment.delete_comment(comment_id)
 
-        
-        if current_user_id != user_id:
-            return jsonify({"error": "Unauthorized access"}), 401
+    if delete_success:
+        return jsonify({'message': 'Comment deleted successfully'}), 200
+    else:
+        return jsonify({'message': 'Error deleting comment'}), 500
 
-        updated_fields = request.json
-
-        if not updated_fields:
-            raise BadRequest("No updated fields provided in the request")
-
-        success = Comment.update_comment(comment_id, updated_fields)
-
-        if success:
-            return jsonify({"message": "Comment updated successfully"}), 200
-        else:
-            return jsonify({"message": "Failed to update comment"}), 500
-
-    except BadRequest as e:
-        return jsonify({"error": str(e)}), 400
-
-    except Exception as e:
-        return jsonify({"error": f"Unknown error: {str(e)}"}), 500
-
-
-@comment_app.route('/api/comments/<user_id>/<comment_id>', methods=['DELETE'])
+@comment_app.route('/api/comments/<user_id>', methods=['GET'])
 @jwt_required()
-def delete_comment_route(user_id, comment_id):
-    try:
-        current_user_id = get_jwt_identity()
-
-        
-        if current_user_id != user_id:
-            return jsonify({"error": "Unauthorized access"}), 401
-
-        success = Comment.delete_comment(comment_id)
-
-        if success:
-            return jsonify({"message": "Comment deleted successfully"}), 200
-        else:
-            return jsonify({"message": "Failed to delete comment"}), 500
-
-    except Exception as e:
-        return jsonify({"error": f"Unknown error: {str(e)}"}), 500
-
-
-@comment_app.route('/api/comments/<user_id>/<media_id>', methods=['GET'])
-@jwt_required()
-def get_comments(user_id, media_id):
-    try:
-        current_user_id = get_jwt_identity()
-
-        if current_user_id != user_id:
-            return jsonify({"error": "Unauthorized access"}), 401
-
-        if not isinstance(media_id, str) or len(media_id) < 24:
-            return jsonify({'message': 'Invalid media ID'}), 400
-
-        comments = Comment.get_comment_by_id(media_id)
-        return jsonify({'comments': comments}), 200
-    except Exception as e:
-        return jsonify({'message': 'Error retrieving comments'}), 500
+def get_comments_by_user(user_id):
+    comments = Comment.get_comments_by_user(user_id)
+    if comments:
+        return jsonify({'comments': [comment for comment in comments]})
+    else:
+        return jsonify({'message': 'No comments found'}), 404
 
     
 

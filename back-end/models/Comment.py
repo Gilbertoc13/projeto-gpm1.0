@@ -10,50 +10,66 @@ db = client.get_database(os.getenv("MONGODB_DBNAME"))
 
 class Comment:
     @staticmethod
-    def create_comment_evaluation_model(username, user_id, content, is_spoiler, media_id):
+    def create_comment(user_id, tmdb_id, is_spoiler):
         try:
             comments_collection = db.comments
-            new_evaluation = {
-                "midia_id": media_id,
+            new_comment = {
                 "user_id": user_id,
-                "username": username,
-                "content": content,
+                "tmdb_id": tmdb_id,  
+                "comment": [],
                 "is_spoiler": is_spoiler
             }
-            result = comments_collection.insert_one(new_evaluation)
+
+            result = comments_collection.insert_one(new_comment)
             return str(result.inserted_id)
+
         except Exception as e:
             print(f"Error creating comment: {e}")
             return None
-
+   
     @staticmethod
-    def update_comment(comment_id, updated_fields):
+    def get_comments_by_user(user_id):
         try:
             comments_collection = db.comments
-            result = comments_collection.update_one({"_id": ObjectId(comment_id)}, {"$set": updated_fields})
-            return result.modified_count > 0
+            return comments_collection.find({"user_id": user_id})
+
+        except Exception as e:
+            print(f"Error retrieving comments: {e}")
+            return None
+   
+    @staticmethod
+    def update_comment(comment_id, comment, is_spoiler):
+        try:
+            comments_collection = db.comments
+
+            update_result = comments_collection.update_one(
+                {'_id': ObjectId(comment_id)},
+                {'$set': {'comment': comment, 'is_spoiler': is_spoiler}}
+            )
+
+            if update_result.matched_count == 1:
+                return True  
+            else:
+                return False 
+
         except Exception as e:
             print(f"Error updating comment: {e}")
-            return False
+            return None
 
     @staticmethod
     def delete_comment(comment_id):
         try:
             comments_collection = db.comments
-            result = comments_collection.delete_one({"_id": ObjectId(comment_id)})
-            return result.deleted_count > 0
+
+            delete_result = comments_collection.delete_one({'_id': ObjectId(comment_id)})
+
+            if delete_result.deleted_count == 1:
+                return True  
+            else:
+                return False 
+
         except Exception as e:
             print(f"Error deleting comment: {e}")
-            return False
-
-    @staticmethod
-    def get_comment_by_id(comment_id):
-        try:
-            comments_collection = db.comments
-            comment = comments_collection.find_one({"_id": ObjectId(comment_id)})
-            return comment
-        except Exception as e:
-            print(f"Error retrieving comment: {e}")
             return None
 
 

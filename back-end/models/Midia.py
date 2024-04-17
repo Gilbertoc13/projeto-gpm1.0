@@ -12,72 +12,98 @@ db = client.get_database(os.getenv("MONGODB_DBNAME"))
 class Midia:
     @staticmethod
     def create_midia(title, image_url, movie_type):
-      midia_collection = db.midia
-      new_midia = {
-        "title": title,
-        "type": movie_type,  
-        "image_url": image_url,
-        "comments": []
-    }
-      result = midia_collection.insert_one(new_midia)
-      return {
-        "title": title,
-        "id": str(result.inserted_id),  
-        "type": movie_type,
-        "comment": []
-    }
+        try:
+            midia_collection = db.midiq
+            new_midia = {
+                "title": title,
+                "type": movie_type,
+                "image_url": image_url,
+                "comments": []
+            }
+
+            result = midia_collection.insert_one(new_midia)
+            return str(result.inserted_id)
+
+        except Exception as e:
+            print(f"Error creating media: {e}")
+            return None
 
     @staticmethod
-    def get_all_midia_ids():
-        midia_collection = db.midia
-        midia_ids = [movie['_id'] for movie in midia_collection.find()] 
-        return midia_ids
+    def get_midia_by_id(media_id):
+        try:
+            midia_collection = db.midia
+            return midia_collection.find_one({'_id': ObjectId(media_id)})
 
-
-    @staticmethod
-    def get_midia_by_title(title, movie_type):
-        midia_collection = db.midia
-        midia = midia_collection.find_one({"title": title, "type": movie_type})
-        return midia
+        except Exception as e:
+            print(f"Error retrieving media: {e}")
+            return None
 
     @staticmethod
-    def get_midia_by_id_model(midia_id, movie_type="movie"):
-      midia_collection = db.midia
-      midia = midia_collection.find_one(
-        {"_id": midia_id, "type": movie_type}, projection={"title": 1, "image_url": 1}
-    )
-      return midia
+    def update_midia(media_id, title=None, image_url=None, movie_type=None):
+        try:
+            midia_collection = db.midia
+
+         
+            update_document = {}
+            if title:
+                update_document['title'] = title
+            if image_url:
+                update_document['image_url'] = image_url
+            if movie_type:
+                update_document['type'] = movie_type
+
+            if update_document:  
+                update_result = midia_collection.update_one(
+                    {'_id': ObjectId(media_id)},
+                    {'$set': update_document}
+                )
+
+                if update_result.matched_count == 1:
+                    return True  
+                else:
+                    return False  
+
+            else:
+                return False 
+
+        except Exception as e:
+            print(f"Error updating media: {e}")
+            return None
 
     @staticmethod
-    def update_midia(midia_id, updated_fields):
-        midia_collection = db.midia
-        result = midia_collection.update_many({"_id": ObjectId(midia_id)}, {"$set": updated_fields})
-        return result
+    def delete_midia(media_id):
+        try:
+            midia_collection = db.midia
 
-    @staticmethod
-    def delete_midia(midia_id):
-        midia_collection = db.midia
-        result = midia_collection.find_one_and_delete({"_id": ObjectId(midia_id)})
-        return result
+            delete_result = midia_collection.delete_one({'_id': ObjectId(media_id)})
+
+            if delete_result.deleted_count == 1:
+                return True  
+            else:
+                return False  
+
+        except Exception as e:
+            print(f"Error deleting media: {e}")
+            return None
     
     @staticmethod
-    def get_comments(midia_id, content=None):
-      midia_collection = db.midia
-      query = {"_id": ObjectId(midia_id)}
+    def get_media_comments(media_id):
+        try:
+            midia_collection = db.midia
 
-      if content is not None:
-        query["comments.content"] = content
+            
+            media_data = midia_collection.find_one({'_id': ObjectId(media_id)})
 
-      midia = midia_collection.find_one(query)
-    
-      if midia:
-        return midia.get('comments', [])
-      else:
-        return []
+            if media_data:
+                
+                comments = media_data['comments']
+                return comments
+            else:
+                return None
 
-    
-    
-    
+        except Exception as e:
+            print(f"Error retrieving media comments: {e}")
+            return None
 
  
     
