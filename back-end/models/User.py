@@ -40,6 +40,12 @@ class User:
         return user
     
     @staticmethod
+    def get_user_by_username_model(username):
+        users_collection = db.users
+        user = users_collection.find_one({"username": username})
+        return user is not None
+    
+    @staticmethod
     def update_user(user_id, updated_fields):
         users_collection = db.users
         result = users_collection.update_many({"_id": ObjectId(user_id)}, {"$set": updated_fields})

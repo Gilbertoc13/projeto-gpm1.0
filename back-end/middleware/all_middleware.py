@@ -12,9 +12,11 @@ def verify_user(userId):
 
 def verify_email_registered(email):          
     user = User.get_user_by_email_model(email)
-    if user:
-        abort(400, {"message": "Email is not available"})
-    return {"message": "Email is available"}
+    return bool(user)
+
+def verify_username_registered(username):          
+    user = User.get_user_by_username_model(username)
+    return bool(user)
 
 def verify_movie(movie_id):
     verify_movie(movie_id)
