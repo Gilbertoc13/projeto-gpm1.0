@@ -1,6 +1,6 @@
 
 from flask import request,jsonify, Blueprint
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from controller.user_controller import login, create_user_controller, get_user_data
 from models.User import User
 from flask import jsonify
@@ -44,4 +44,12 @@ def create_user_route():
 def data_user_route():
     return get_user_data()
 
-
+@main_bp.route('/api/user_name', methods=['GET'])
+@jwt_required()
+def get_user_name():
+    user_email = get_jwt_identity()
+    user = User.get_user_by_email_model(user_email)
+    if user:
+        return jsonify({"user": user.get("username", "Unknown")}), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
