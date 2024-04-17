@@ -46,10 +46,16 @@ def add_comment(midia_id, content):
 
 
 
-@comment_app.route('/api/comments/<comment_id>', methods=['PUT'])
-def update_comment_route(comment_id):
+@comment_app.route('/api/comments/<user_id>/<comment_id>', methods=['PUT'])
+@jwt_required()
+def update_comment_route(user_id, comment_id):
     try:
+        current_user_id = get_jwt_identity()
+
         
+        if current_user_id != user_id:
+            return jsonify({"error": "Unauthorized access"}), 401
+
         updated_fields = request.json
 
         if not updated_fields:
@@ -69,10 +75,16 @@ def update_comment_route(comment_id):
         return jsonify({"error": f"Unknown error: {str(e)}"}), 500
 
 
-@comment_app.route('/api/comments/<comment_id>', methods=['DELETE'])
-def delete_comment_route(comment_id):
+@comment_app.route('/api/comments/<user_id>/<comment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment_route(user_id, comment_id):
     try:
+        current_user_id = get_jwt_identity()
+
         
+        if current_user_id != user_id:
+            return jsonify({"error": "Unauthorized access"}), 401
+
         success = Comment.delete_comment(comment_id)
 
         if success:
@@ -84,17 +96,23 @@ def delete_comment_route(comment_id):
         return jsonify({"error": f"Unknown error: {str(e)}"}), 500
 
 
-@comment_app.route('/api/comments/<media_id>', methods=['GET'])
-def get_comments(media_id):
-    
-    if not isinstance(media_id, str) or len(media_id) < 24:
-        return jsonify({'message': 'Invalid media ID'}), 400
-
+@comment_app.route('/api/comments/<user_id>/<media_id>', methods=['GET'])
+@jwt_required()
+def get_comments(user_id, media_id):
     try:
+        current_user_id = get_jwt_identity()
+
+        if current_user_id != user_id:
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        if not isinstance(media_id, str) or len(media_id) < 24:
+            return jsonify({'message': 'Invalid media ID'}), 400
+
         comments = Comment.get_comment_by_id(media_id)
         return jsonify({'comments': comments}), 200
     except Exception as e:
         return jsonify({'message': 'Error retrieving comments'}), 500
+
     
 
 
