@@ -12,11 +12,12 @@ load_dotenv()
 
 
 user_tk = os.getenv('JWT_SECRET_KEY')
-media_app = Blueprint("media_app", __name__)
+midia_app = Blueprint("midia_app", __name__)
 
-@media_app.route('/api/media/<media_type>', methods=['POST'])
+@midia_app.route('/api/midia/<midia_type>', methods=['POST'])
 def create_media(midia_type):
     try:
+
         data = request.get_json()
         if data is None:
             raise BadRequest("Missing request data (expected JSON)")
@@ -35,12 +36,12 @@ def create_media(midia_type):
             "content": {"comments": comments}
         }
 
-        existing_midia = Midia.get_movie_by_title(title)
+        existing_midia = Midia.get_midia_by_title(title,midia_type)
         if existing_midia:
             existing_midia['_id'] = str(existing_midia['_id'])
             return jsonify({"message": f"Media '{title}' already exists", "data": existing_midia}), 200
         else:
-            new_midia_id = Midia.create_midia(midia)
+            new_midia_id = Midia.create_midia(midia,image_url, midia_type)
             return jsonify({"message": "Media created successfully", "_id": new_midia_id}), 201
 
     except BadRequest as e:
@@ -50,9 +51,11 @@ def create_media(midia_type):
         return jsonify({"message": "Internal server error"}), 500
 
 
-@media_app.route('/api/user/movies/<user_id>', methods=['GET'])
+@midia_app.route('/api/user/movies/<user_id>', methods=['GET'])
+@jwt_required()
 def get_user_movies(user_id):
     try:
+        user_id = get_jwt_identity()
       
         if not user_id or not isinstance(user_id, str):
             raise BadRequest("Invalid user ID")
@@ -83,7 +86,7 @@ def add_to_watchlist(media_type, media_id, user_id):
 
 
     if media_type == 'movies':
-        media_data = Midia.get_movie_by_id_model({'_id': ObjectId(media_id)})
+        media_data = Midia.get_midia_by_id_model({'_id': ObjectId(media_id)})
         if not media_data:
             return jsonify({'message': 'Media not found'}), 404
 
@@ -93,7 +96,7 @@ def add_to_watchlist(media_type, media_id, user_id):
     return jsonify({'message': 'Media added to watchlist successfully'}), 200
 
 
-@media_app.route('/api/watchlist/<media_type>/<media_id>', methods=['POST'])
+@midia_app.route('/api/watchlist/<media_type>/<media_id>', methods=['POST'])
 @jwt_required()
 def add_to_watchlist(media_type, media_id):
     
@@ -113,27 +116,24 @@ def add_to_watchlist(media_type, media_id):
     
     return jsonify({'message': 'Media added to watchlist successfully'}), 200
 
-@media_app.route('/api/user/movies/<movie_id>', methods=['DELETE'])
-def delete_movie_from_user_list(movie_id):
+@midia_app.route('/api/user/movies/<movie_id>', methods=['DELETE'])
+@jwt_required()
+def delete_movie_from_user_list(midia_id):
     try:
         
-        user_id = request.json.get('user_id')
-
+        user_id = get_jwt_identity()
         
         if not user_id or not isinstance(user_id, str):
             raise BadRequest("Invalid user ID")
-
         
-        if not User.get_user_movie_list(user_id, movie_id):
+        if not User.get_user_midia_list(user_id, midia_id):
             return jsonify({"message": "Movie not found in user's list"}), 404
-
        
-        success = User.remove_movie_from_list(user_id, movie_id)
+        success = User.remove_midia_from_list(user_id, midia_id)
 
         if success:
 
-            
-            User.remove_movie_from_watched_movies(user_id, movie_id)
+            User.remove_midia_from_watched_movies(user_id, midia_id)
 
             return jsonify({"message": "Movie removed from user's list successfully"}), 200
         else:
@@ -144,6 +144,23 @@ def delete_movie_from_user_list(movie_id):
 
     except Exception as e:
         return jsonify({"error": f"Unknown error: {str(e)}"}), 500
+
+
+@midia_app.route('/api/media/<media_id>/<content>', methods=['GET'])
+def get_comments(media_id, content):
+    try:
+        midia = Midia.get_midia_by_id_model(media_id)
+
+        if not midia:
+            return jsonify({'message': 'Media not found'}), 404
+        
+        comments = Midia.get_comments(media_id, content)
+
+        return jsonify({'comments': comments}), 200
+
+    except Exception as e:
+        return jsonify({'message': 'Error retrieving comments', 'error': str(e)}), 500
+
 
 
 

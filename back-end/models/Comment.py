@@ -14,7 +14,7 @@ class Comment:
         try:
             comments_collection = db.comments
             new_evaluation = {
-                "media_id": media_id,
+                "midia_id": media_id,
                 "user_id": user_id,
                 "username": username,
                 "content": content,

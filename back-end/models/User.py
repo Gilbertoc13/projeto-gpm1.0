@@ -15,7 +15,7 @@ class User:
             "username": username,
             "email": email,
             "password": hashed_password_base64,
-            "movie_list": [],
+            "midia_list": [],
             "watched_movies": []
         }
         result = users_collection.insert_one(new_user)
@@ -58,7 +58,7 @@ class User:
         return result
     
     @staticmethod
-    def get_user_movie_list(user_id):
+    def get_user_midia_list(user_id):
         user = User.get_user_by_id_model(user_id)
         if user:
             return user.get('movie_list', [])
@@ -66,23 +66,23 @@ class User:
             return None
         
     @staticmethod
-    def remove_movie_from_list(user_id, movie_id):
+    def remove_midia_from_list(user_id, midia_id):
         try:
             users_collection = db.users
-            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"movie_details": movie_id}})
+            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"midia_list": midia_id}})
             return result.modified_count > 0
         except Exception as e:
-            print(f"Error deleting movie details from user: {e}")
+            print(f"Error deleting midia details from user: {e}")
             return False
 
     @staticmethod
-    def remove_movie_from_watched_movies(user_id, movie_id):
+    def remove_midia_from_watched_movies(user_id, midia_id):
         try:
             users_collection = db.users
-            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched_movies": movie_id}})
+            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched_midias": midia_id}})
             return result.modified_count > 0
         except Exception as e:
-            print(f"Error removing movie from watched movies of user: {e}")
+            print(f"Error removing movie from watched media of user: {e}")
             return False
         
  
