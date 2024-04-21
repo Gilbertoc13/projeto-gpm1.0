@@ -11,7 +11,7 @@ from middleware.all_middleware import verify_email_registered
 def login(email, password):
     user = User.get_user_by_email_model(email)
     if user and bcrypt.checkpw(password.encode(), base64.b64decode(user["password"].encode())):
-        token = create_access_token(identity=email)
+        token = token = create_access_token(identity=str(user["_id"]))
         return {"access_token": token}, 200
     if not user:
         return {"message": "User not in database"}, 402

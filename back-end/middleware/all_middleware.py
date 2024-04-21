@@ -1,5 +1,5 @@
 from flask import abort
-from models.Midia import Midia
+from models.Media import MediaAPI
 from models.User import User
 from models.Comment import Comment
 
@@ -18,7 +18,7 @@ def verify_email_registered(email):
 
 def verify_movie(movie_id):
     verify_movie(movie_id)
-    movie = Midia.get_movie_by_id_model(movie_id)
+    movie = MediaAPI.get_movie_by_id_model(movie_id)
     previous_movie = movie.get("previousMovieId")
     if previous_movie:
         return previous_movie

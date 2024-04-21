@@ -1,13 +1,22 @@
 
+import os
+from bson import ObjectId
+from dotenv import load_dotenv
 from flask import request,jsonify, Blueprint
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from pymongo import MongoClient
 from controller.user_controller import login, create_user_controller, get_user_data
+from models.Media import MediaAPI
 from models.User import User
 from flask import jsonify
 
 
 
+load_dotenv()
+client = MongoClient(os.getenv("MONGODB_URI"))
+db = client.get_database(os.getenv("MONGODB_DBNAME"))
 
+api_key = os.getenv('TMDB_KEY')
 main_bp = Blueprint("main_bp", __name__)
 
 
@@ -45,3 +54,45 @@ def data_user_route():
     return get_user_data()
 
 
+
+
+@main_bp.route('/api/add_watched_list', methods=['POST'])
+@jwt_required() 
+def add_watched_list_route():
+    try:
+        
+
+        data = request.json
+        tmdb_id = data.get('tmdb_id')
+        media_type = data.get('media_type')
+
+        if not tmdb_id or not media_type:
+            return jsonify({"error": "Missing parameters"}), 400
+
+        if User.add_watched_list(tmdb_id, media_type, api_key):
+            return jsonify({"message": "Movie added to watched list successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to add movie to watched list"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
+
+@main_bp.route('/api/delete_from_watched_list', methods=['DELETE'])
+@jwt_required() 
+def delete_from_watched_list_route():
+    try:
+        data = request.json
+        tmdb_id = data.get('tmdb_id')
+        media_type = data.get('media_type')
+
+        if not tmdb_id:
+            return jsonify({"error": "Missing 'tmdb_id' parameter"}), 400
+        if not media_type:
+            return jsonify({"error": "Missing 'media_type' parameter"}), 400
+
+        if User.delete_from_watched_list(tmdb_id, media_type, api_key):
+            return jsonify({"message": "Movie removed from watched list successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to remove movie from watched list"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500

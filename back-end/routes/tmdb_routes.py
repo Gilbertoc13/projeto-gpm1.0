@@ -44,25 +44,31 @@ def get_popular_media():
         if data.get('results'):
             media = data['results'][0]
             media_id = media['id']
-            media_logo = get_media_logo(media_id)
-            media_details = get_trend_details(media_id)
+            
+            # Obtendo o logo do media
+            media_logo = None
+            url_logo = f"https://api.themoviedb.org/3/{tipo}/{media_id}/images"
+            parametros = {'api_key': api_key}
+            response_logo = requests.get(url_logo, params=parametros)
+            
+            if response_logo.status_code == 200:
+                data_logo = response_logo.json()
+                pt_item = next((item for item in data_logo.get('logos', []) if item.get('iso_639_1') == 'pt'), None)
+                selected_item = pt_item or next((item for item in data_logo.get('logos', []) if item.get('iso_639_1') == 'en'), None)
+                if selected_item:
+                    media_logo = f"https://image.tmdb.org/t/p/w300{selected_item.get('file_path')}"
+            
+            media_details = None
+            url_details = f"https://api.themoviedb.org/3/{tipo}/{media_id}?api_key={api_key}&append_to_response=images%2Caggregate_credits%2Cwatch_providers%2Csimilar%2Cexternal_ids%2Ccontent_ratings%2Creleases&language=pt-BR"
+            response_details = requests.get(url_details)
+            if response_details.status_code == 200:
+                media_details = response_details.json()
+            
             return jsonify({"trend": media_details, "trend_logo": media_logo})
         else:
             return jsonify({"error": "Não foi possível obter o filme ou série mais assistido(a)"}), 404
     else:
         return jsonify({"error": "Não foi possível obter o filme ou série mais assistido(a)"}), response.status_code
-    
-def get_trend_details(media_id):
-    tipo = request.args.get('tipo')
-    if not media_id:
-        media_id = request.args.get('id')
-    url = f"https://api.themoviedb.org/3/{tipo}/{media_id}?api_key={api_key}&append_to_response=images%2Caggregate_credits%2Cwatch_providers%2Csimilar%2Cexternal_ids%2Ccontent_ratings%2Creleases&language=pt-BR"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        return None
     
 @tmdb_bp.route("/tmdb/details", methods=["GET"])
 def get_details():
@@ -70,27 +76,24 @@ def get_details():
     media_id = request.args.get('id')
     url = f"https://api.themoviedb.org/3/{tipo}/{media_id}?api_key={api_key}&append_to_response=images%2Caggregate_credits%2Cwatch_providers%2Csimilar%2Cexternal_ids%2Ccontent_ratings%2Creleases%2Ccredits&language=pt-BR"
     response = requests.get(url)
-    media_logo = get_media_logo(media_id)
+    
     if response.status_code == 200:
         data = response.json()
+        media_logo = None
+        url_logo = f"https://api.themoviedb.org/3/{tipo}/{media_id}/images"
+        parametros = {'api_key': api_key}
+        response_logo = requests.get(url_logo, params=parametros)
+        
+        if response_logo.status_code == 200:
+            data_logo = response_logo.json()
+            pt_item = next((item for item in data_logo.get('logos', []) if item.get('iso_639_1') == 'pt'), None)
+            selected_item = pt_item or next((item for item in data_logo.get('logos', []) if item.get('iso_639_1') == 'en'), None)
+            if selected_item:
+                media_logo = f"https://image.tmdb.org/t/p/w300{selected_item.get('file_path')}"
+        
         return jsonify({"trend": data, "trend_logo": media_logo})
     else:
         return None
-    
-def get_media_logo(media_id):
-    tipo = request.args.get('tipo')
-    url = f"https://api.themoviedb.org/3/{tipo}/{media_id}/images"
-    parametros = {'api_key': api_key}
-    response = requests.get(url, params=parametros)
-
-    if response.status_code == 200:
-        data = response.json()
-        pt_item = next((item for item in data.get('logos', []) if item.get('iso_639_1') == 'pt'), None)
-        selected_item = pt_item or next((item for item in data.get('logos', []) if item.get('iso_639_1') == 'en'), None)
-        if selected_item:
-            url = f"https://image.tmdb.org/t/p/w300{selected_item.get('file_path')}"
-            return url
-    return None
 
 @tmdb_bp.route("/tmdb/trailer", methods=["GET"])
 def get_media_trailer():
@@ -169,3 +172,28 @@ def search_tmdb():
         return jsonify({"search_results": data})
     else:
         return jsonify({"error": "Não foi possível realizar a pesquisa"}), response.status_code
+    
+@tmdb_bp.route("/tmdb/watch_providers", methods=["GET"])
+def fetch_watch_providers():
+    tipo = request.args.get('tipo')
+    id = request.args.get('id')
+    url = f"https://api.themoviedb.org/3/{tipo}/{id}/watch/providers?api_key={api_key}&language=pt-BR"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify({"providers": data})
+    else:
+        return jsonify({"error": "Não foi possível obter os providers."}), response.status_code
+    
+
+@tmdb_bp.route("/tmdb/season", methods=["GET"])
+def fetch_season():
+    id = request.args.get('id')
+    season = request.args.get('season')
+    url = f"https://api.themoviedb.org/3/tv/{id}/season/{season}?api_key={api_key}&language=pt-BR"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify({"season": data})
+    else:
+        return jsonify({"error": "Não foi possível obter os dados da temporada"}), response.status_code

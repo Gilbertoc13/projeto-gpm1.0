@@ -1,109 +1,109 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from pymongo import MongoClient
 from bson import ObjectId
 import os
 from dotenv import load_dotenv
+from models.Media import MediaAPI
 
 load_dotenv()
 client = MongoClient(os.getenv("MONGODB_URI"))
 db = client.get_database(os.getenv("MONGODB_DBNAME"))
-class User:
 
+class User:
     @staticmethod
-    def create_user_model(email,username, hashed_password_base64):
-        users_collection = db.users
-        new_user = {
-            "username": username,
-            "email": email,
-            "password": hashed_password_base64,
-            "watched_movies": []
-        }
-        result = users_collection.insert_one(new_user)
-        return str(result.inserted_id)
+    def create_user_model(email, username, hashed_password_base64):
+        try:
+            users_collection = db.users
+            new_user = {
+                "username": username,
+                "email": email,
+                "password": hashed_password_base64,
+                "watched": []
+            }
+            result = users_collection.insert_one(new_user)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error creating user: {e}")
+            return None
 
     @staticmethod
     def get_user_by_username_model(username):
-        users_collection = db.users
-        user = users_collection.find_one({"username": username})
-        return user
-    
+        try:
+            users_collection = db.users
+            user = users_collection.find_one({"username": username})
+            return user
+        except Exception as e:
+            print(f"Error retrieving user by username: {e}")
+            return None
+
     @staticmethod
     def get_user_by_email_model(email):
-        users_collection = db.users
-        user = users_collection.find_one({"email": email})
-        return user
-    
+        try:
+            users_collection = db.users
+            user = users_collection.find_one({"email": email})
+            return user
+        except Exception as e:
+            print(f"Error retrieving user by email: {e}")
+            return None
+
     @staticmethod
     def get_user_by_id_model(id):
-        users_collection = db.users
-        user = users_collection.find_one({"_id": ObjectId(id)})
-        return user
-    
+        try:
+            users_collection = db.users
+            user = users_collection.find_one({"_id": ObjectId(id)})
+            return user
+        except Exception as e:
+            print(f"Error retrieving user by ID: {e}")
+            return None
+
     @staticmethod
     def update_user(user_id, updated_fields):
-        users_collection = db.users
-        result = users_collection.update_many({"_id": ObjectId(user_id)}, {"$set": updated_fields})
-        return result
-    
-    @staticmethod
-    def get_followers_model(user_id):
-        users_collection = db.users
-        followers = users_collection.find({"following": user_id})
-        return list(followers)
-    
+        try:
+            users_collection = db.users
+            result = users_collection.update_many({"_id": ObjectId(user_id)}, {"$set": updated_fields})
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating user: {e}")
+            return False
+
     @staticmethod
     def delete_account_model(user_id):
-        users_collection = db.users
-        result = users_collection.find_one_and_delete({"_id": ObjectId(user_id)})
-        return result
-    
-    @staticmethod
-    def add_movie_to_watchlist(user_id, movie_id):
         try:
             users_collection = db.users
-
-            existing_watchlist = users_collection.find_one({'_id': ObjectId(user_id)}, {'watchlist': 1})
-            if existing_watchlist and 'watchlist' in existing_watchlist:
-                if movie_id in existing_watchlist['watchlist']:
-                    return {'message': 'Movie already exists in watchlist'}, 400
-
-            
-            update_result = users_collection.update_one(
-                {'_id': ObjectId(user_id)},
-                {'$push': {'watchlist': movie_id}}
-            )
-
-            if update_result.modified_count == 1:
-                return {'message': 'Movie added to watchlist successfully'}, 200
-            else:
-                return {'message': 'Error adding movie to watchlist'}, 500
-
+            result = users_collection.find_one_and_delete({"_id": ObjectId(user_id)})
+            return result is not None
         except Exception as e:
-            print(f"Error adding movie to watchlist: {e}")
-            return {'message': 'Internal server error'}, 500
+            print(f"Error deleting user: {e}")
+            return False
+    
 
     @staticmethod
-    def delete_movie_from_watchlist(user_id, movie_id):
-        try:
+    @jwt_required() 
+    def add_watched_list(tmdb_id, media_type, api_key):
+      try:
+        user_id = get_jwt_identity()
+        media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
+        if media_details:
             users_collection = db.users
+            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"watched": tmdb_id}})
+            return result.modified_count > 0
+        else:
+            return False
+      except Exception as e:
+        print(f"Error adding movie to watched list: {e}")
+        return False
+      
+    @staticmethod
+    @jwt_required() 
+    def delete_from_watched_list(tmdb_id,media_type, api_key):
+      try:
+        user_id = get_jwt_identity()
+        media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
+        if media_details:
+          users_collection = db.users
+          result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched": tmdb_id}})
+          return result.modified_count > 0
+      except Exception as e:
+        print(f"Error deleting movie from watched list: {e}")
+        return False
 
-            update_result = users_collection.update_one(
-                {'_id': ObjectId(user_id)},
-                {'$pull': {'watchlist': movie_id}}
-            )
-
-            if update_result.modified_count == 1:
-                return {'message': 'Movie removed from watchlist successfully'}, 200
-            elif update_result.matched_count == 0:
-                return {'message': 'User not found'}, 404
-            else:
-                return {'message': 'Error removing movie from watchlist'}, 500
-
-        except Exception as e:
-            print(f"Error removing movie from watchlist: {e}")
-            return {'message': 'Internal server error'}, 500
- 
-  
-        
-    
-    
-    
