@@ -35,11 +35,10 @@ def create_media():
 
     
 
-@media_app.route("/api/media/get_or_create", methods=["POST"])
+@media_app.route("/api/media/get_or_create", methods=["GET"])
 def get_or_create_media_route():
-    data = request.json
-    tmdb_id = data.get("tmdb_id")
-    media_type = data.get("media_type")
+    tmdb_id = request.args.get("tmdb_id")
+    media_type = request.args.get("media_type")
 
     if tmdb_id and media_type:
         media_id = MediaAPI.get_or_create_media(tmdb_id, media_type, db, api_key)

@@ -28,13 +28,9 @@ class User:
 
     @staticmethod
     def get_user_by_username_model(username):
-        try:
-            users_collection = db.users
-            user = users_collection.find_one({"username": username})
-            return user
-        except Exception as e:
-            print(f"Error retrieving user by username: {e}")
-            return None
+        users_collection = db.users
+        user = users_collection.find_one({"username": username})
+        return user is not None
 
     @staticmethod
     def get_user_by_email_model(email):

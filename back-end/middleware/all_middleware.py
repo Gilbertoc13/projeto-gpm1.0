@@ -16,21 +16,11 @@ def verify_email_registered(email):
         abort(400, {"message": "Email is not available"})
     return {"message": "Email is available"}
 
-def verify_movie(movie_id):
-    verify_movie(movie_id)
-    movie = MediaAPI.get_movie_by_id_model(movie_id)
-    previous_movie = movie.get("previousMovieId")
-    if previous_movie:
-        return previous_movie
-    return False
-
-def verify_comment(comment_id):
-    verify_comment(comment_id)
-    comment = Comment.get_comment_by_id(comment_id)
-    previous_comment = Comment.get("previousCommentId")
-    if previous_comment:
-        return previous_comment
-    return False
+def verify_username_registered(username):
+    user = User.get_user_by_username_model(username)
+    if user:
+        abort(400, {"message": "Username is not available"})
+    return {"message": "Username is available"}
 
 
 

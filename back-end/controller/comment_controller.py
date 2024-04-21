@@ -4,7 +4,7 @@ from middleware.all_middleware import verify_comment
 
 
 def create_comment_controller(username, user_id, content, is_spoiler, media_id):
-    comment_id = Comment.create_comment_evaluation_model(username, user_id, content, is_spoiler, media_id)
+    comment_id = Comment.create_comment(username, user_id, content, is_spoiler, media_id)
     return comment_id
 
 

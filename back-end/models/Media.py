@@ -31,7 +31,7 @@ class MediaAPI:
     def add_media_to_database(media_details, db):
         if media_details:
             media_data = {
-                "tmdb_id": media_details["id"],  # Ajuste para "id" em vez de "tmdb_id"
+                "tmdb_id": media_details["id"],  
                 "backdrop_path": media_details["backdrop_path"],
                 "title": media_details["title"],
                 "vote_average": media_details["vote_average"],

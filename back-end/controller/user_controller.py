@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity
 from models.User import User
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest 
-from middleware.all_middleware import verify_email_registered
+from middleware.all_middleware import verify_email_registered, verify_username_registered
 
 
 def login(email, password):
@@ -19,7 +19,13 @@ def login(email, password):
         return {"message": "Invalid username or password"}, 401
 
 def create_user_controller(email, username, password):
-    verify_email_registered(email)  
+    email_registered = verify_email_registered(email)
+    username_registered = verify_username_registered(username)
+
+    if email_registered:
+        return({"message": "Email is not available"}, 400)
+    if username_registered:
+        return({"message": "Username is not available"}, 401)
 
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     hashed_password_base64 = base64.b64encode(hashed_password).decode()

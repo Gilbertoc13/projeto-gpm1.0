@@ -1,6 +1,5 @@
 
 import os
-from bson import ObjectId
 from dotenv import load_dotenv
 from flask import request,jsonify, Blueprint
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -96,3 +95,30 @@ def delete_from_watched_list_route():
             return jsonify({"error": "Failed to remove movie from watched list"}), 500
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
+
+
+@main_bp.route('/api/user_name', methods=['GET'])
+@jwt_required()
+def get_user_name():
+    user_email = get_jwt_identity()
+    user = User.get_user_by_email_model(user_email)
+    if user:
+        return jsonify({"user": user.get("username", "Unknown")}), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
+    
+
+@main_bp.route("/api/watched_movies", methods=["GET"])
+@jwt_required()
+def get_watched_media():
+    current_user_id = get_jwt_identity()
+
+    user = User.get_user_by_id_model(current_user_id, db)
+    if user:
+        watched= user.get("watched", [])
+        return jsonify({"watched_movies": watched}), 200
+    else:
+        return jsonify({"error": "User not found."}), 404
+
+    
