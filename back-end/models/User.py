@@ -5,6 +5,7 @@ from bson import ObjectId
 import os
 from dotenv import load_dotenv
 from models.Media import MediaAPI
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 load_dotenv()
 client = MongoClient(os.getenv("MONGODB_URI"))
@@ -102,22 +103,22 @@ class User:
       except Exception as e:
         print(f"Error adding movie to watched list: {e}")
         return False
-    
+      
     @staticmethod
     @jwt_required() 
-    def delete_from_watched_list(tmdb_id,media_type, api_key):
-      try:
-        user_id = get_jwt_identity()
-        user = User.get_user_by_id_model(user_id)
-        
-        if user:
-            media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
-        if media_details:
-          users_collection = db.users
-          result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched": tmdb_id}})
-          return result.modified_count > 0
-      except Exception as e:
-        print(f"Error deleting movie from watched list: {e}")
+    def delete_from_watched_list(tmdb_id, media_type, api_key):
+        try:
+            user_id = get_jwt_identity()
+            user = User.get_user_by_id_model(user_id)
+            if user:
+                media_details = MediaAPI.get_or_create_media(tmdb_id, media_type, api_key)
+                if media_details:
+                    users_collection = db.users
+                    result = users_collection.update_one(
+                        {"_id": ObjectId(user_id)},
+                        {"$pull": {"watched": {"tmdb_id": tmdb_id, "media_type": media_type}}}
+                    )
+                    return result.modified_count > 0
+        except Exception as e:
+            print(f"Error deleting movie from watched list: {e}")
         return False
-      
-
