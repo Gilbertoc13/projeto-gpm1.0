@@ -22,12 +22,6 @@ def delete_comment(comment_id):
         print(f"Error deleting comment: {e}")
         return False
 
-def list_comments(media_id):
-    try:
-        return Comment.get_comment_by_id(media_id)
-    except Exception as e:
-        print(f"Error listing comments: {e}")
-        return []
 
 
 

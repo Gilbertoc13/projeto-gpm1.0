@@ -44,6 +44,7 @@ def create_user_route():
     password = data["password"]
 
     response, status_code = create_user_controller(email, username, password)
+    print(response)
     return jsonify(response), status_code
 
 
@@ -55,7 +56,7 @@ def data_user_route():
 
 
 
-@main_bp.route('/api/add_watched_list', methods=['POST'])
+@main_bp.route('/api/user/add_watched_list', methods=['POST'])
 @jwt_required() 
 def add_watched_list_route():
     try:
@@ -69,14 +70,14 @@ def add_watched_list_route():
             return jsonify({"error": "Missing parameters"}), 400
 
         if User.add_watched_list(tmdb_id, media_type, api_key):
-            return jsonify({"message": "Movie added to watched list successfully"}), 200
+            return jsonify({"message": "Media added to watched list successfully"}), 200
         else:
-            return jsonify({"error": "Failed to add movie to watched list"}), 500
+            return jsonify({"error": "Failed to add media to watched list"}), 500
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
     
 
-@main_bp.route('/api/delete_from_watched_list', methods=['DELETE'])
+@main_bp.route('/api/user/delete_watched', methods=['DELETE'])
 @jwt_required() 
 def delete_from_watched_list_route():
     try:
@@ -90,13 +91,12 @@ def delete_from_watched_list_route():
             return jsonify({"error": "Missing 'media_type' parameter"}), 400
 
         if User.delete_from_watched_list(tmdb_id, media_type, api_key):
-            return jsonify({"message": "Movie removed from watched list successfully"}), 200
+            return jsonify({"message": "Media removed from watched list successfully"}), 200
         else:
-            return jsonify({"error": "Failed to remove movie from watched list"}), 500
+            return jsonify({"error": "Failed to remove media from watched list"}), 500
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
     
-
 
 @main_bp.route('/api/user_name', methods=['GET'])
 @jwt_required()
@@ -109,16 +109,52 @@ def get_user_name():
         return jsonify({"message": "User not found"}), 404
     
 
-@main_bp.route("/api/watched_movies", methods=["GET"])
+@main_bp.route('/api/user/watched', methods=['GET'])
 @jwt_required()
-def get_watched_media():
-    current_user_id = get_jwt_identity()
+def get_watched_list():
+    try:
+        user_id = get_jwt_identity()
+        user = User.get_user_by_id_model(user_id)
+        if user:
+            watched_list = user.get("watched", []) 
+            return jsonify({"watched_media": watched_list}), 200
+        else:
+            return jsonify({"error": "User not found."}), 404
+    except Exception as e:
+        print(f"Error retrieving watched list: {e}")
+        return jsonify({"error": "Failed to retrieve watched list."}), 500
 
-    user = User.get_user_by_id_model(current_user_id, db)
-    if user:
-        watched= user.get("watched", [])
-        return jsonify({"watched_movies": watched}), 200
-    else:
-        return jsonify({"error": "User not found."}), 404
+
+
+@main_bp.route("/api/user/media/visa", methods=["GET"])
+@jwt_required()
+def verify_media_visa():
+    try:
+        user_id = get_jwt_identity()
+        media_id = request.args.get("id")
+        media_type = request.args.get("type")
+
+        if not media_id or not media_type:
+            return jsonify({"error": "Missing parameters 'id' and/or 'type'"}), 400
+
+        user = User.get_user_by_id_model(user_id)
+
+        if user:
+            watched_list = user.get("watched", [])
+
+            for media in watched_list:
+                if media.get("tmdb_id") == media_id and media.get("media_type") == media_type:
+                    return jsonify({"visa": True}), 200
+
+            return jsonify({"visa": False}), 200
+        else:
+            return jsonify({"error": "User not found."}), 404
+    except Exception as e:
+        print(f"Error checking if media is watched: {e}")
+        return jsonify({"error": "Failed to check if media is watched."}), 500
+
+
+
+
 
     

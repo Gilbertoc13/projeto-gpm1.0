@@ -42,9 +42,9 @@ def create_comment_route():
 @jwt_required()  
 def get_comments_by_user_route():
     try:
-        user_id = get_jwt_identity()  
+        user_email = get_jwt_identity()  
         comments_collection = db.comments
-        comments = comments_collection.find({"user_id": user_id})
+        comments = comments_collection.find({"user_id": user_email})
 
        
         comments = [json_util.dumps(comment) for comment in comments]

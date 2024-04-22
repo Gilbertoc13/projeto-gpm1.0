@@ -38,9 +38,9 @@ class Comment:
     @jwt_required()  
     def get_comments_by_user_route():
       try:
-        user_id = get_jwt_identity()  
+        user_email = get_jwt_identity()  
         comments_collection = db.comments
-        comments = comments_collection.find({"user_id": user_id})
+        comments = comments_collection.find({"user_id": user_email})
 
         
         comments = [json_util.dumps(comment) for comment in comments]
@@ -54,11 +54,11 @@ class Comment:
     @jwt_required()  
     def update_comment(comment_id, comment, is_spoiler):
         try:
-            user_id = get_jwt_identity()  
+            user_email = get_jwt_identity()  
             comments_collection = db.comments
 
             update_result = comments_collection.update_one(
-                {'_id': ObjectId(comment_id), 'user_id': user_id},  
+                {'_id': ObjectId(comment_id), 'user_id': user_email},  
                 {'$set': {'comment': comment, 'is_spoiler': is_spoiler}}
             )
 
@@ -75,10 +75,10 @@ class Comment:
     @jwt_required()  
     def delete_comment(comment_id):
         try:
-            user_id = get_jwt_identity()  
+            user_email = get_jwt_identity()  
             comments_collection = db.comments
 
-            delete_result = comments_collection.delete_one({'_id': ObjectId(comment_id), 'user_id': user_id})  
+            delete_result = comments_collection.delete_one({'_id': ObjectId(comment_id), 'user_email': user_email})  
 
             if delete_result.deleted_count == 1:
                 return True  

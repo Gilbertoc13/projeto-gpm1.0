@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from pymongo import MongoClient
 from bson import ObjectId
@@ -72,29 +73,45 @@ class User:
             print(f"Error deleting user: {e}")
             return False
     
-
     @staticmethod
-    @jwt_required() 
     def add_watched_list(tmdb_id, media_type, api_key):
       try:
         user_id = get_jwt_identity()
-        media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
-        if media_details:
-            users_collection = db.users
-            result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"watched": tmdb_id}})
-            return result.modified_count > 0
+        if user_id:
+            media_details = MediaAPI.get_or_create_media(tmdb_id, media_type, api_key)
+            if media_details:
+                users_collection = db.users
+                result = users_collection.update_one(
+                    {"_id":ObjectId(user_id)},
+                    {"$addToSet": {
+                        "watched": {
+                            "tmdb_id": tmdb_id,
+                            "media_type": media_type,
+                            "title": media_details.get("title") or media_details.get("name"),
+                            "poster_path": media_details.get("poster_path") or "N/A",
+                            "vote_average": media_details.get("vote_average") or 0,
+                            "release_date": media_details.get("release_date") or media_details.get("first_air_date")
+                        }
+                    }}
+                )
+                return result.modified_count > 0
+            else:
+                return False 
         else:
-            return False
+            return False  
       except Exception as e:
         print(f"Error adding movie to watched list: {e}")
         return False
-      
+    
     @staticmethod
     @jwt_required() 
     def delete_from_watched_list(tmdb_id,media_type, api_key):
       try:
         user_id = get_jwt_identity()
-        media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
+        user = User.get_user_by_id_model(user_id)
+        
+        if user:
+            media_details = MediaAPI.get_media_details(tmdb_id, media_type, api_key)
         if media_details:
           users_collection = db.users
           result = users_collection.update_one({"_id": ObjectId(user_id)}, {"$pull": {"watched": tmdb_id}})
@@ -102,4 +119,5 @@ class User:
       except Exception as e:
         print(f"Error deleting movie from watched list: {e}")
         return False
+      
 

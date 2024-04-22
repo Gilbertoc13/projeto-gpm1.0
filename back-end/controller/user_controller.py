@@ -11,7 +11,7 @@ from middleware.all_middleware import verify_email_registered, verify_username_r
 def login(email, password):
     user = User.get_user_by_email_model(email)
     if user and bcrypt.checkpw(password.encode(), base64.b64decode(user["password"].encode())):
-        token = token = create_access_token(identity=str(user["_id"]))
+        token = create_access_token(identity=str(user["_id"]))
         return {"access_token": token}, 200
     if not user:
         return {"message": "User not in database"}, 402
@@ -21,6 +21,7 @@ def login(email, password):
 def create_user_controller(email, username, password):
     email_registered = verify_email_registered(email)
     username_registered = verify_username_registered(username)
+    print(email_registered, username_registered)
 
     if email_registered:
         return({"message": "Email is not available"}, 400)
@@ -30,7 +31,7 @@ def create_user_controller(email, username, password):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     hashed_password_base64 = base64.b64encode(hashed_password).decode()
     user_id = User.create_user_model(email, username, hashed_password_base64)
-    token = create_access_token(identity=email)
+    token = create_access_token(identity=str(user_id))
     return {"id": user_id, "message": f"User {username} created", "access_token": token}, 201
 
 def get_user_data():
