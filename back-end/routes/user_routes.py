@@ -51,8 +51,8 @@ def data_user_route():
 @main_bp.route('/api/user_name', methods=['GET'])
 @jwt_required()
 def get_user_name():
-    user_email = get_jwt_identity()
-    user = User.get_user_by_email_model(user_email)
+    user_id = get_jwt_identity()
+    user = User.get_user_by_id_model(user_id)
     if user:
         return jsonify({"user": user.get("username", "Unknown")}), 200
     else:
