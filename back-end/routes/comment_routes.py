@@ -29,7 +29,7 @@ def create_comment_route():
         is_spoiler = data.get('is_spoiler')
         stars = data.get('stars')
 
-        if not username or not media_id or not media_type or not review or not is_spoiler or not stars:
+        if not username or not media_id or not media_type or not review or not stars:
             return jsonify({"error": "Missing required attributes"}), 400
 
         comment_id = Comment.create_comment(user_id, username, media_id, media_type, review, is_spoiler, stars)
