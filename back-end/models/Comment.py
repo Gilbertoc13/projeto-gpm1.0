@@ -3,7 +3,6 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from models.Media import MediaAPI
 from pymongo import MongoClient
 from bson import ObjectId, json_util
-import json
 import os
 from dotenv import load_dotenv
 
