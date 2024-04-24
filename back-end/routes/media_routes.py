@@ -48,18 +48,8 @@ def get_or_create_media_route():
             return jsonify({"error": "Failed to get or create media."}), 500
     else:
         return jsonify({"error": "Invalid request parameters."}), 400
+
     
-
-@media_app.route("/api/media/comments/<tmdb_id>", methods=["GET"])
-def get_media_comments_route(tmdb_id):
-    comments = MediaAPI.get_media_comments(tmdb_id, db)
-    if comments is not None:
-        return jsonify({"comments": comments}), 200
-    else:
-        return jsonify({"error": "Failed to retrieve comments."}), 404
-    
-
-
 @media_app.route("/api/media", methods=["GET"])
 def get_all_media_route():
     all_media = MediaAPI.get_all_media(db)

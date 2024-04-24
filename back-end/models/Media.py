@@ -1,4 +1,7 @@
 
+import json
+from bson import ObjectId, json_util
+from flask import jsonify
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
@@ -91,3 +94,81 @@ class MediaAPI:
         collection = db["media"]
         all_media = collection.find({}, {"_id": 0}) 
         return list(all_media)
+    
+
+
+    @staticmethod
+    def add_comment_to_media(tmdb_id, comment_id, review, user_id, media_type, media_title, is_spoiler, stars):
+     try:
+        media_details = MediaAPI.get_or_create_media(tmdb_id, media_type, api_key)
+
+        if not media_details:
+            print("Failed to get media details")
+            return False
+
+        collection = db["media"]
+        media = collection.find_one({"tmdb_id": tmdb_id})
+        if not media:
+            print("Media not found")
+            return False
+
+        if media_details:
+            result = collection.update_one(
+                {"tmdb_id": tmdb_id},
+                {
+                    "$push": {
+                        "comments": {
+                            "comment_id": ObjectId(comment_id),  
+                            "review": review,
+                            "user_id": ObjectId(user_id),  
+                            "media_type": media_type,
+                            "media_title": media_title,
+                            "is_spoiler": is_spoiler,
+                            "stars": stars
+                        }
+                    }
+                }
+            )
+
+            if result.modified_count > 0:
+                print("Comment added to media successfully")
+                return True
+            else:
+                print("Failed to add comment to media")
+                return False
+        else:
+            print("Failed to get media details")
+            return False
+     except Exception as e:
+        print(f"Error adding comment to media: {e}")
+        return False
+
+
+    @staticmethod
+    def get_all_media_comments():
+        try:
+            collection = db["media"]
+            media_with_comments = collection.find({"comments": {"$exists": True, "$ne": []}})
+
+            media_list = [json.loads(json_util.dumps(media)) for media in media_with_comments]
+
+            return media_list
+        except Exception as e:
+            print(f"Error retrieving media with comments: {e}")
+            return None
+        
+    @staticmethod
+    def get_media_comment(tmdb_id, media_type):
+     try:
+        collection = db["media"]
+        media_with_comments = collection.find_one({"tmdb_id": tmdb_id, "media_type": media_type})
+
+        if media_with_comments:
+            return json.loads(json_util.dumps([media_with_comments]))
+        else:
+            return None
+     except Exception as e:
+        print(f"Error retrieving media with comments: {e}")
+        return None
+     
+

@@ -1,4 +1,4 @@
-from flask import jsonify
+
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from pymongo import MongoClient
 from bson import ObjectId
@@ -10,6 +10,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 load_dotenv()
 client = MongoClient(os.getenv("MONGODB_URI"))
 db = client.get_database(os.getenv("MONGODB_DBNAME"))
+api_key= os.getenv('TMDB_KEY')
 
 class User:
     @staticmethod
