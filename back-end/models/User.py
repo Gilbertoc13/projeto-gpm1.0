@@ -14,12 +14,13 @@ api_key= os.getenv('TMDB_KEY')
 
 class User:
     @staticmethod
-    def create_user_model(email, username, hashed_password_base64):
+    def create_user_model(email, username,role, hashed_password_base64):
         try:
             users_collection = db.users
             new_user = {
                 "username": username,
                 "email": email,
+                "role": role,
                 "password": hashed_password_base64,
                 "watched": []
             }

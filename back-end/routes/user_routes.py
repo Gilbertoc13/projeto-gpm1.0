@@ -31,15 +31,17 @@ def login_route():
 @main_bp.route("/api/cadastro", methods=["POST"])
 def create_user_route():
     data = request.get_json()
-    if not all(key in data for key in ["username", "email", "password"]):
+    if not all(key in data for key in ["username", "email", "role", "password" ]):
         return jsonify({"message": "Missing required fields"}), 400
 
 
     username = data["username"]
     email = data["email"]
+    role = data["role"]
     password = data["password"]
 
-    response, status_code = create_user_controller(email, username, password)
+
+    response, status_code = create_user_controller(email, username, role, password)
     print(response)
     return jsonify(response), status_code
 
@@ -57,7 +59,22 @@ def get_user_name():
         return jsonify({"user": user.get("username", "Unknown")}), 200
     else:
         return jsonify({"message": "User not found"}), 404
-
+    
+@main_bp.route('/api/user_id', methods=['GET'])
+@jwt_required()
+def get_user_id():
+    user_id = get_jwt_identity()
+    user = User.get_user_by_id_model(user_id)
+    if user:
+        user_role = user.get("role", None)
+        is_admin = user_role == "admin"  
+        return jsonify({
+            "userId": str(user["_id"]),
+            "role": user_role,
+            "isAdmin": is_admin  
+        }), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
 
 @main_bp.route('/api/user/watched', methods=['GET'])
 @jwt_required()
@@ -138,3 +155,50 @@ def verify_media_seen():
     except Exception as e:
         print(f"Error checking if media is watched: {e}")
         return jsonify({"error": "Failed to check if media is watched."}), 500
+
+
+@main_bp.route("/api/user/profile", methods=["GET"])
+@jwt_required()
+def view_profile():
+    try:
+        user_id = get_jwt_identity()
+        user = db.users.find_one({"_id": user_id}, {"_id": 0, "password": 0})
+
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": f"Error viewing profile: {str(e)}"}), 500
+
+
+
+@main_bp.route("/api/user/profile", methods=["POST"])
+@jwt_required()
+def update_profile():
+    try:
+        user_id = get_jwt_identity()
+        user = User.get_user_by_id_model(user_id)
+
+        email = request.form.get("email")
+        username = request.form.get("username")
+
+        result = db.users.update_one(
+            {"_id": user},
+            {"$set": {
+                "email": email,
+                "username": username,
+            }}
+        )
+
+        if result.modified_count > 0:
+           
+            return jsonify({"message": "Profile updated successfully"}), 200
+        else:
+            
+            return jsonify({"error": "No documents were modified"}), 404
+
+    except Exception as e:
+        return jsonify({"error": f"Error updating profile: {str(e)}"}), 500
+

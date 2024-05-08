@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity
 from models.User import User
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest 
-from middleware.all_middleware import verify_email_registered, verify_username_registered
+from middleware.all_middleware import verify_email_registered, verify_username_registered, verify_username
 
 
 def login(email, password):
@@ -18,19 +18,23 @@ def login(email, password):
     else:
         return {"message": "Invalid username or password"}, 401
 
-def create_user_controller(email, username, password):
+def create_user_controller(email, username,role, password):
     email_registered = verify_email_registered(email)
     username_registered = verify_username_registered(username)
-    print(email_registered, username_registered)
+    username_contains_space = verify_username(username)
+    print(email_registered, username_registered, username_contains_space)
 
     if email_registered:
         return({"message": "Email is not available"}, 400)
     if username_registered:
         return({"message": "Username is not available"}, 401)
+    if username_contains_space:
+        return ({"message": "Username cannot contain spaces"}, 400)
+
 
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     hashed_password_base64 = base64.b64encode(hashed_password).decode()
-    user_id = User.create_user_model(email, username, hashed_password_base64)
+    user_id = User.create_user_model(email, username.lower(), role, hashed_password_base64)
     token = create_access_token(identity=str(user_id))
     return {"id": user_id, "message": f"User {username} created", "access_token": token}, 201
 
