@@ -34,7 +34,7 @@ class User:
     def get_user_by_username_model(username):
         users_collection = db.users
         user = users_collection.find_one({"username": username})
-        return user is not None
+        return user
 
     @staticmethod
     def get_user_by_email_model(email):

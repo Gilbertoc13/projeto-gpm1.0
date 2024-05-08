@@ -1,5 +1,8 @@
 
 import os
+import bcrypt
+import base64
+from bson import ObjectId
 from dotenv import load_dotenv
 from flask import request,jsonify, Blueprint
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -31,13 +34,13 @@ def login_route():
 @main_bp.route("/api/cadastro", methods=["POST"])
 def create_user_route():
     data = request.get_json()
-    if not all(key in data for key in ["username", "email", "role", "password" ]):
+    if not all(key in data for key in ["username", "email", "password" ]):
         return jsonify({"message": "Missing required fields"}), 400
 
 
     username = data["username"]
     email = data["email"]
-    role = data["role"]
+    role = 'user'
     password = data["password"]
 
 
@@ -162,8 +165,9 @@ def verify_media_seen():
 def view_profile():
     try:
         user_id = get_jwt_identity()
-        user = db.users.find_one({"_id": user_id}, {"_id": 0, "password": 0})
-
+        user = User.get_user_by_id_model(user_id)
+        user["_id"] = str(user["_id"])
+        
         if user:
             return jsonify(user), 200
         else:
@@ -174,31 +178,47 @@ def view_profile():
 
 
 
-@main_bp.route("/api/user/profile", methods=["POST"])
+
+@main_bp.route("/api/user/profile", methods=["PUT"])
 @jwt_required()
 def update_profile():
     try:
         user_id = get_jwt_identity()
         user = User.get_user_by_id_model(user_id)
 
-        email = request.form.get("email")
+        new_password = request.form.get("new_password")
         username = request.form.get("username")
+        new_email = request.form.get("email")
 
-        result = db.users.update_one(
-            {"_id": user},
-            {"$set": {
-                "email": email,
-                "username": username,
-            }}
-        )
-
-        if result.modified_count > 0:
-           
-            return jsonify({"message": "Profile updated successfully"}), 200
+        if new_email != user["email"]:
+            emailAlreadyTaken = User.get_user_by_email_model(new_email)
         else:
-            
-            return jsonify({"error": "No documents were modified"}), 404
+            emailAlreadyTaken = False
+        
+        if username == user["username"]:
+            usernameAlreadyTaken = False
+        else:
+            usernameAlreadyTaken = User.get_user_by_username_model(username)
 
+        if usernameAlreadyTaken:
+            return jsonify({"error": "Username already taken"}), 400
+        if emailAlreadyTaken:
+            return jsonify({"error": "Email already used"}), 401
+        
+        if new_password:
+            hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+            user["password"] = hashed_password
+
+            
+        if username:
+            user["username"] = username
+        
+        if new_email:
+            user["email"] = new_email
+        
+        db.users.update_one({"_id": ObjectId(user_id)}, {"$set": user})
+        return jsonify({"message": "Profile updated successfully"}), 200
+        
     except Exception as e:
         return jsonify({"error": f"Error updating profile: {str(e)}"}), 500
 

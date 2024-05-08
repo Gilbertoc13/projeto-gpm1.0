@@ -18,11 +18,10 @@ def login(email, password):
     else:
         return {"message": "Invalid username or password"}, 401
 
-def create_user_controller(email, username,role, password):
+def create_user_controller(email, username, role, password):
     email_registered = verify_email_registered(email)
     username_registered = verify_username_registered(username)
     username_contains_space = verify_username(username)
-    print(email_registered, username_registered, username_contains_space)
 
     if email_registered:
         return({"message": "Email is not available"}, 400)
