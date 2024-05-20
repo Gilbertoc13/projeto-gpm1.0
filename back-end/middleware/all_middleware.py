@@ -1,7 +1,6 @@
 from flask import abort
-from models.Media import MediaAPI
 from models.User import User
-from models.Comment import Comment
+
 
 
 def verify_user(userId):               
@@ -22,6 +21,7 @@ def verify_username_registered(username):
         abort(401, {"message": "Username is not available"})
     return
 
-
-
+def verify_username(username):
+    if ' ' in username:
+        abort(400, {"message": "Username cannot contain spaces"})
 

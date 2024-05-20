@@ -1,5 +1,8 @@
 
 import os
+import bcrypt
+import base64
+from bson import ObjectId
 from dotenv import load_dotenv
 from flask import request,jsonify, Blueprint
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -31,15 +34,17 @@ def login_route():
 @main_bp.route("/api/cadastro", methods=["POST"])
 def create_user_route():
     data = request.get_json()
-    if not all(key in data for key in ["username", "email", "password"]):
+    if not all(key in data for key in ["username", "email", "password" ]):
         return jsonify({"message": "Missing required fields"}), 400
 
 
     username = data["username"]
     email = data["email"]
+    role = 'user'
     password = data["password"]
 
-    response, status_code = create_user_controller(email, username, password)
+
+    response, status_code = create_user_controller(email, username, role, password)
     print(response)
     return jsonify(response), status_code
 
@@ -57,7 +62,22 @@ def get_user_name():
         return jsonify({"user": user.get("username", "Unknown")}), 200
     else:
         return jsonify({"message": "User not found"}), 404
-
+    
+@main_bp.route('/api/user_id', methods=['GET'])
+@jwt_required()
+def get_user_id():
+    user_id = get_jwt_identity()
+    user = User.get_user_by_id_model(user_id)
+    if user:
+        user_role = user.get("role", None)
+        is_admin = user_role == "admin"  
+        return jsonify({
+            "userId": str(user["_id"]),
+            "role": user_role,
+            "isAdmin": is_admin  
+        }), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
 
 @main_bp.route('/api/user/watched', methods=['GET'])
 @jwt_required()
@@ -138,3 +158,67 @@ def verify_media_seen():
     except Exception as e:
         print(f"Error checking if media is watched: {e}")
         return jsonify({"error": "Failed to check if media is watched."}), 500
+
+
+@main_bp.route("/api/user/profile", methods=["GET"])
+@jwt_required()
+def view_profile():
+    try:
+        user_id = get_jwt_identity()
+        user = User.get_user_by_id_model(user_id)
+        user["_id"] = str(user["_id"])
+        
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": f"Error viewing profile: {str(e)}"}), 500
+
+
+
+
+@main_bp.route("/api/user/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    try:
+        user_id = get_jwt_identity()
+        user = User.get_user_by_id_model(user_id)
+
+        new_password = request.form.get("new_password")
+        username = request.form.get("username")
+        new_email = request.form.get("email")
+
+        if new_email != user["email"]:
+            emailAlreadyTaken = User.get_user_by_email_model(new_email)
+        else:
+            emailAlreadyTaken = False
+        
+        if username == user["username"]:
+            usernameAlreadyTaken = False
+        else:
+            usernameAlreadyTaken = User.get_user_by_username_model(username)
+
+        if usernameAlreadyTaken:
+            return jsonify({"error": "Username already taken"}), 400
+        if emailAlreadyTaken:
+            return jsonify({"error": "Email already used"}), 401
+        
+        if new_password:
+            hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+            user["password"] = hashed_password
+
+            
+        if username:
+            user["username"] = username
+        
+        if new_email:
+            user["email"] = new_email
+        
+        db.users.update_one({"_id": ObjectId(user_id)}, {"$set": user})
+        return jsonify({"message": "Profile updated successfully"}), 200
+        
+    except Exception as e:
+        return jsonify({"error": f"Error updating profile: {str(e)}"}), 500
+

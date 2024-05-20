@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from pymongo import MongoClient
 from models.Comment import Comment
 from dotenv import load_dotenv
+from models.User import User
 
 load_dotenv()
 
@@ -47,19 +48,21 @@ def update_comment_route(comment_id):
     try:
         data = request.json
 
-        username = data.get('username')
-        media_id = data.get('media_id')
-        media_type = data.get('media_type')
-        review = data.get('review')
-        is_spoiler = data.get('is_spoiler')
-        stars = data.get('stars')
+        user_id = get_jwt_identity()
+        comment = Comment.get_comment(comment_id)
+        if comment and (str(comment.get("user_id")) == str(user_id) or User.get_user_by_id_model(user_id).get('role') == "admin"):
+            review = data.get('review')
+            is_spoiler = data.get('is_spoiler')
+            stars = data.get('stars')
+            success = Comment.update_comment(comment_id, review, is_spoiler, stars)
 
-        success = Comment.update_comment(comment_id, username, media_id, media_type, review, is_spoiler, stars)
-
-        if success:
-            return jsonify({"message": "Comment updated successfully"}), 200
+            if success:
+                return jsonify({"message": "Comment updated successfully"}), 200
+            else:
+                return jsonify({"error": "Failed to update comment"}), 500
         else:
-            return jsonify({"error": "Failed to update comment"}), 500
+            return jsonify({"error": "Unauthorized"}), 401
+        
     except Exception as e:
         return jsonify({"error": f"Error processing the request: {str(e)}"}), 500
 
@@ -69,7 +72,7 @@ def delete_comment_route(comment_id):
     try:
         user_id = get_jwt_identity()
         comment = Comment.get_comment(comment_id)
-        if comment and comment.user_id == user_id:
+        if comment and (str(comment.get("user_id")) == str(user_id) or User.get_user_by_id_model(user_id).get('role') == "admin"):
             success = Comment.delete_comment(comment_id)
             if success:
                 return jsonify({"message": "Comment deleted successfully"}), 200
@@ -84,12 +87,12 @@ def delete_comment_route(comment_id):
 def get_comments_by_media_route(media_type, media_id):
     try:
         comments_collection = db["comment"]
-        comments = comments_collection.find({"media_id": media_id, "media_type": media_type}, {"_id": 0})
+        comments = comments_collection.find({"media_id": media_id, "media_type": media_type})
 
         comments_list = []
         for comment in comments:
-            comment.pop("_id", None)
-            comment.pop("user_id", None)
+            comment["_id"] = str(comment["_id"])
+            comment["user_id"] = str(comment["user_id"])
             comments_list.append(comment)
 
         return jsonify({"comments": comments_list}), 200

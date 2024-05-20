@@ -14,12 +14,13 @@ api_key= os.getenv('TMDB_KEY')
 
 class User:
     @staticmethod
-    def create_user_model(email, username, hashed_password_base64):
+    def create_user_model(email, username,role, hashed_password_base64):
         try:
             users_collection = db.users
             new_user = {
                 "username": username,
                 "email": email,
+                "role": role,
                 "password": hashed_password_base64,
                 "watched": []
             }
@@ -33,7 +34,7 @@ class User:
     def get_user_by_username_model(username):
         users_collection = db.users
         user = users_collection.find_one({"username": username})
-        return user is not None
+        return user
 
     @staticmethod
     def get_user_by_email_model(email):
