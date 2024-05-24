@@ -1,4 +1,3 @@
-import os
 import unittest
 from unittest.mock import patch, MagicMock
 
@@ -8,7 +7,6 @@ from bson import ObjectId
 from flask import Flask
 import jwt
 
-
 class TestUser(unittest.TestCase):
 
     def setUp(self):
@@ -16,7 +14,7 @@ class TestUser(unittest.TestCase):
         self.app.config['JWT_TOKEN_LOCATION'] = ['headers']
         self.app.config['JWT_HEADER_NAME'] = 'Authorization'
         self.app.config['JWT_HEADER_TYPE'] = 'Bearer'
-        self.app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+        self.app.config['JWT_SECRET_KEY'] = 'uKLnKgBiNobBnRt7qNpBmVg8vI3eXh8rR3dRgUk5pM'
         self.jwt = JWTManager(self.app)
         self.app_context = self.app.app_context()
         self.app_context.push()

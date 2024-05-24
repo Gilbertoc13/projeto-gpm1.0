@@ -114,6 +114,20 @@ def get_watched_list():
     except Exception as e:
         print(f"Error retrieving watched list: {e}")
         return jsonify({"error": "Failed to retrieve watched list."}), 500
+    
+@main_bp.route('/api/user/watched/<username>', methods=['GET'])
+@jwt_required()
+def get_user_watched_list(username):
+    try:
+        user = User.get_user_by_username_model(username)
+        if user:
+            watched_list = user.get("watched", [])
+            return jsonify({"watched_media": watched_list}), 200
+        else:
+            return jsonify({"error": "User not found."}), 404
+    except Exception as e:
+        print(f"Error retrieving watched list: {e}")
+        return jsonify({"error": "Failed to retrieve watched list."}), 500
 
 @main_bp.route('/api/user/watched', methods=['DELETE'])
 @jwt_required() 
@@ -134,7 +148,7 @@ def delete_from_watched_list_route():
             return jsonify({"error": "Failed to remove media from watched list"}), 500
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-    
+
 @main_bp.route('/api/user/watched', methods=['POST'])
 @jwt_required() 
 def add_watched_list_route():
