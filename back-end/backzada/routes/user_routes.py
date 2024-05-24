@@ -78,6 +78,27 @@ def get_user_id():
         }), 200
     else:
         return jsonify({"message": "User not found"}), 404
+    
+@main_bp.route('/api/user/get_profile', methods=['GET'])
+@jwt_required()
+def get_watched_list_by_user():
+    try:
+        user_id = get_jwt_identity()
+        userRequested = User.get_user_by_id_model(user_id)
+        username = request.args.get('username')
+        user = User.get_user_by_username_model(username)
+        if user:
+            watched_list = user.get("watched", []) 
+            if userRequested == user:
+                return jsonify({"watched_media": watched_list, "isOwner": True}), 200
+            else:
+                return jsonify({"watched_media": watched_list, "isOwner": False}), 200
+        else:
+            return jsonify({"error": "User not found."}), 404
+    except Exception as e:
+        print(f"Error retrieving watched list: {e}")
+        return jsonify({"error": "Failed to retrieve watched list."}), 500
+
 
 @main_bp.route('/api/user/watched', methods=['GET'])
 @jwt_required()
