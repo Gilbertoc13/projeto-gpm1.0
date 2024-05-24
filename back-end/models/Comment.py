@@ -14,7 +14,7 @@ api_key = os.getenv('TMDB_KEY')
 
 class Comment:
     @staticmethod
-    def create_comment(user_id, username, media_id, media_type, review, is_spoiler, stars):
+    def create_comment(user_id, username, media_id, media_type, review, is_spoiler, stars, title, userRole):
         try:
             collection = db["comment"]
 
@@ -25,7 +25,9 @@ class Comment:
                 "media_type": media_type,
                 "review": review,
                 "stars": stars,
-                "is_spoiler": is_spoiler
+                "is_spoiler": is_spoiler,
+                "title": title,
+                "userRole": userRole
             }
             
             result = collection.insert_one(new_comment)

@@ -1,7 +1,6 @@
 from flask import abort
 from models.User import User
-
-
+from models.Person import Person
 
 def verify_user(userId):               
     user = User.get_user_by_id_model(userId)
@@ -25,3 +24,11 @@ def verify_username(username):
     if ' ' in username:
         abort(400, {"message": "Username cannot contain spaces"})
 
+def verify_person(personId, username):
+    person = Person.get_person_by_id_model(personId)
+    person2 = Person.get_person_by_username_model(username)
+    if person:
+        return True
+    if person2:
+        return True
+    return False

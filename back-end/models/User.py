@@ -124,3 +124,15 @@ class User:
         except Exception as e:
             print(f"Error deleting movie from watched list: {e}")
         return False
+    
+    def update_user_role(user_id, new_role):
+        try:
+            users_collection = db.users
+            result = users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {"role": new_role}}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating user role: {e}")
+            return False

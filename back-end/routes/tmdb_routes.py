@@ -197,3 +197,14 @@ def fetch_season():
         return jsonify({"season": data})
     else:
         return jsonify({"error": "Não foi possível obter os dados da temporada"}), response.status_code
+    
+@tmdb_bp.route("/tmdb/person", methods=["GET"])
+def fetch_person():
+    id = request.args.get('id')
+    url = f"https://api.themoviedb.org/3/person/{id}?api_key={api_key}&language=pt-BR&append_to_response=external_ids%2Ccombined_credits"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify({"person": data})
+    else:
+        return jsonify({"error": "Não foi possível obter os dados da pessoa"}), response.status_code
