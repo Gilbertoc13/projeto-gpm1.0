@@ -1,10 +1,8 @@
-from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from pymongo import MongoClient
-from bson import ObjectId
 import os
 from dotenv import load_dotenv
-from models.Media import MediaAPI
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 load_dotenv()
 client = MongoClient(os.getenv("MONGODB_URI"))

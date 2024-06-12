@@ -11,6 +11,7 @@ from controller.user_controller import login, create_user_controller, get_user_d
 from models.Media import MediaAPI
 from models.User import User
 from flask import jsonify
+from models.Playlist import Playlist
 
 load_dotenv()
 client = MongoClient(os.getenv("MONGODB_URI"))
@@ -89,10 +90,12 @@ def get_watched_list_by_user():
         user = User.get_user_by_username_model(username)
         if user:
             watched_list = user.get("watched", []) 
+            playlists = Playlist.get_playlists_by_user(str(user["_id"]), db)
+            print(playlists)
             if userRequested == user:
-                return jsonify({"watched_media": watched_list, "isOwner": True}), 200
+                return jsonify({"watched_media": watched_list, "isOwner": True, "playlists": playlists}), 200
             else:
-                return jsonify({"watched_media": watched_list, "isOwner": False}), 200
+                return jsonify({"watched_media": watched_list, "isOwner": False, "playlists": playlists}), 200
         else:
             return jsonify({"error": "User not found."}), 404
     except Exception as e:

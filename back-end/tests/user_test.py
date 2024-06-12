@@ -1,11 +1,15 @@
+import os
 import unittest
 from unittest.mock import patch, MagicMock
-
+from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager
 from models.User import User
 from bson import ObjectId
 from flask import Flask
 import jwt
+
+load_dotenv()
+JWT_key= os.getenv("JWT_SECRET_KEY")
 
 class TestUser(unittest.TestCase):
 
@@ -14,7 +18,7 @@ class TestUser(unittest.TestCase):
         self.app.config['JWT_TOKEN_LOCATION'] = ['headers']
         self.app.config['JWT_HEADER_NAME'] = 'Authorization'
         self.app.config['JWT_HEADER_TYPE'] = 'Bearer'
-        self.app.config['JWT_SECRET_KEY'] = 'uKLnKgBiNobBnRt7qNpBmVg8vI3eXh8rR3dRgUk5pM'
+        self.app.config['JWT_SECRET_KEY'] = JWT_key
         self.jwt = JWTManager(self.app)
         self.app_context = self.app.app_context()
         self.app_context.push()
