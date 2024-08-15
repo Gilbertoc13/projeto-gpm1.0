@@ -1,4 +1,5 @@
-# Projeto: Site de Avaliações de Filmes e Séries
+# Projeto: MovieMetricks
+
 
 ## Descrição
 Este projeto consiste na criação de um site de avaliações de filmes e séries, onde os usuários podem deixar comentários e avaliações sobre suas produções favoritas. O site foi desenvolvido utilizando Python com o framework Flask e MongoDB como banco de dados.
